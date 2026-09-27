@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UsahaKu - Produk & Harga</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <nav class="topnav">
+    <div class="brand"><div class="mark">U</div><div class="name">UsahaKu</div></div>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="pesanan.html">Daftar Pesanan</a>
+    <a href="produk.html" class="active">Produk & Harga</a>
+    <a href="stok.html">Stok/Inventori</a>
+    <a href="laporan.html">Arus Kas</a>
+    <a href="laba-rugi.html">Laba Rugi</a>
+  </nav>
+
+  <main>
+    <header class="pagehead">
+      <h1>Produk & Harga</h1>
+      <p>Kelola daftar produk dan HPP acuan untuk pencatatan stok masuk. HPP pesanan mengikuti harga stok masuk dengan metode FIFO. Produk nonaktif tidak tersedia untuk transaksi baru.</p>
+    </header>
+    <p id="status">Menghubungkan ke database...</p>
+
+    <!-- Pencarian produk -->
+    <div class="searchProduk">
+      <label for="searchInput">Cari produk</label>
+      <input type="search" id="searchInput" placeholder="Cari kode atau nama produk..." />
+    </div>
+
+    <form id="formTambah">
+      <div class="fieldGroup">
+        <label for="inputNama">Nama produk</label>
+        <input type="text" id="inputNama" required>
+      </div>
+      <div class="fieldGroup">
+        <label for="inputHpp">HPP acuan terbaru per unit</label>
+        <div class="inputRupiah">
+          <span class="prefix">Rp</span>
+          <input type="text" id="inputHpp" data-currency-input inputmode="decimal" placeholder="0" required>
+        </div>
+      </div>
+      <button type="submit" class="btnIcon btnTambah" title="Tambah produk" aria-label="Tambah produk"></button>
+    </form>
+
+    <table>
+      <thead>
+        <tr><th>Kode</th><th>Nama Produk</th><th>HPP Acuan Terbaru</th><th>Status</th><th>Aksi</th></tr>
+      </thead>
+      <tbody id="tabelProduk"></tbody>
+    </table>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/currency-input.js"></script>
+  <script src="js/produk.js"></script>
+</body>
+</html>

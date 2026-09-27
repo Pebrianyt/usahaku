@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UsahaKu - Dashboard</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <nav class="topnav">
+    <div class="brand"><div class="mark">U</div><div class="name">UsahaKu</div></div>
+    <a href="dashboard.html" class="active">Dashboard</a>
+    <a href="pesanan.html">Daftar Pesanan</a>
+    <a href="produk.html">Produk & Harga</a>
+    <a href="stok.html">Stok/Inventori</a>
+    <a href="laporan.html">Arus Kas</a>
+    <a href="laba-rugi.html">Laba Rugi</a>
+  </nav>
+
+  <main>
+    <header class="pagehead">
+      <h1>Dashboard</h1>
+      <p>Pantau pesanan, omzet, laba, saldo kas, dan produk terlaris dalam satu halaman.</p>
+    </header>
+    <div class="reportFilter dashboardFilter">
+      <label for="filterBulanDashboard">Pilih bulan</label>
+      <input type="month" id="filterBulanDashboard">
+    </div>
+    <p id="status">Menghubungkan ke database...</p>
+
+    <div class="cards">
+      <div class="card"><div class="label">Jumlah Nomor Pesanan</div><div class="value" id="totalPesanan">-</div></div>
+      <div class="card"><div class="label">Omzet Terealisasi</div><div class="value" id="omzetRealisasi">-</div></div>
+      <div class="card"><div class="label">Omzet Pesanan Pending</div><div class="value" id="omzetPotential">-</div></div>
+      <div class="card"><div class="label">Total Omzet Proyeksi</div><div class="value" id="omset">-</div></div>
+      <div class="card"><div class="label">Laba Bersih Terealisasi</div><div class="value" id="labaBersihRealisasi">-</div></div>
+      <div class="card"><div class="label">Laba Bersih Proyeksi</div><div class="value" id="labaBersihProyeksi">-</div></div>
+      <div class="card"><div class="label">Saldo Kas Terkini</div><div class="value" id="saldoKas">-</div></div>
+    </div>
+
+    <section class="dashboardCharts">
+      <article class="chartCard">
+        <h2>Jumlah Pesanan per Bulan</h2>
+        <p>Nomor pesanan yang sama dihitung satu kali, meski berisi beberapa produk.</p>
+        <div id="grafikPesanan" class="dashboardChart" role="img" aria-label="Grafik jumlah pesanan per bulan"></div>
+      </article>
+      <article class="chartCard">
+        <h2>Perkembangan Omzet</h2>
+        <p>Omzet terealisasi dan omzet dari pesanan pending, berdasarkan tanggal pesanan.</p>
+        <div id="grafikOmzet" class="dashboardChart" role="img" aria-label="Grafik omzet terealisasi dan pesanan pending"></div>
+      </article>
+      <article class="chartCard">
+        <h2>Uang Masuk dan Keluar</h2>
+        <p>Perbandingan uang masuk dan keluar yang dicatat pada menu Arus Kas.</p>
+        <div id="grafikKas" class="dashboardChart" role="img" aria-label="Grafik uang masuk dan keluar per bulan"></div>
+      </article>
+      <article class="chartCard">
+        <h2>Item Pareto</h2>
+        <p>Lima produk terlaris berdasarkan jumlah barang dari pesanan pada bulan terpilih.</p>
+        <div id="grafikProdukKeluar" class="dashboardChart" role="img" aria-label="Lima produk terlaris berdasarkan jumlah barang dari pesanan"></div>
+      </article>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

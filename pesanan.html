@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UsahaKu - Pesanan</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <nav class="topnav">
+    <div class="brand"><div class="mark">U</div><div class="name">UsahaKu</div></div>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="pesanan.html" class="active">Daftar Pesanan</a>
+    <a href="produk.html">Produk & Harga</a>
+    <a href="stok.html">Stok/Inventori</a>
+    <a href="laporan.html">Arus Kas</a>
+    <a href="laba-rugi.html">Laba Rugi</a>
+  </nav>
+
+  <main>
+    <header class="pagehead">
+      <h1>Daftar Pesanan</h1>
+        <p>Catat pesanan pelanggan, pantau pembayarannya, dan lihat modal serta keuntungan.</p>
+    </header>
+
+    <p id="status">Menghubungkan ke database...</p>
+
+    <form id="formPesanan">
+      <div class="pesananUtama">
+        <div class="fieldGroup">
+          <label for="inputNoPesanan">Nomor pesanan</label>
+          <input type="text" id="inputNoPesanan" required>
+        </div>
+        <div class="fieldGroup">
+          <label for="inputTanggal">Tanggal pesanan</label>
+          <input type="date" id="inputTanggal" required>
+        </div>
+        <div class="fieldGroup">
+          <label for="inputTotalAkhir">Total penghasilan akhir pesanan (setelah potongan)</label>
+          <div class="inputRupiah">
+            <span class="prefix">Rp</span>
+            <input type="text" id="inputTotalAkhir" data-currency-input inputmode="decimal" required>
+          </div>
+        </div>
+      </div>
+      <div id="produkPesananList" class="produkPesananList"></div>
+      <div class="pesananFormActions">
+        <button type="button" id="btnTambahProduk" class="btnTambahProduk">+ Tambah produk</button>
+        <button type="button" id="btnBatalEditPesanan" class="btnTambahProduk" hidden>Batal edit</button>
+        <button type="submit" class="btnIcon btnSubmitPesanan" title="Simpan pesanan" aria-label="Simpan pesanan">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        </button>
+      </div>
+    </form>
+
+    <div class="bulkbar">
+      <label class="bulkSelectAll" for="checkAll">
+        <input type="checkbox" id="checkAll" aria-label="Pilih semua pesanan pending">
+        <span>Pilih semua</span>
+      </label>
+      <span id="bulkCount">0 dipilih</span>
+      <button type="button" id="btnRealisasiTerpilih" class="btnIcon btnRealisasi" title="Tandai realisasi yang dipilih" disabled>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      </button>
+    </div>
+
+    <section class="pesananFilters" aria-label="Pencarian dan filter pesanan">
+      <div class="fieldGroup">
+        <label for="cariPesanan">Cari nomor pesanan</label>
+        <input type="search" id="cariPesanan" placeholder="Ketik nomor pesanan">
+      </div>
+      <div class="fieldGroup">
+        <label for="filterBulanPesanan">Bulan pesanan</label>
+        <input type="month" id="filterBulanPesanan">
+      </div>
+      <div class="fieldGroup">
+        <label for="filterStatusPesanan">Status pesanan</label>
+        <select id="filterStatusPesanan">
+          <option value="">Semua status</option>
+          <option value="Pending">Pending</option>
+          <option value="Realisasi">Realisasi</option>
+        </select>
+      </div>
+    </section>
+
+    <div class="pesananTableScroll">
+    <table class="tblPesanan">
+      <thead>
+        <tr>
+          <th class="thPilihRealisasi" aria-label="Pilih pesanan untuk realisasi"></th>
+          <th>No Pesanan</th>
+          <th>Tanggal</th>
+          <th>Produk</th>
+          <th>Qty</th>
+          <th>Total HPP<br>Produk</th>
+          <th>Total Penghasilan<br>Akhir</th>
+          <th>Total HPP<br>Pesanan</th>
+          <th>Profit<br>Penjualan</th>
+          <th>Margin</th>
+          <th title="Status pembayaran: sudah masuk (Realisasi) atau belum (Pending)">Status</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="tabelPesanan"></tbody>
+    </table>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/currency-input.js"></script>
+  <script src="js/pesanan.js"></script>
+</body>
+</html>

@@ -1,0 +1,309 @@
+:root{
+  --bg:#F7F5F1; --panel:#FFFFFF; --ink:#1B2430; --sub:#6B7480;
+  --line:#E7E3DB; --brand:#9bbe92; --brand-ink:#EAF3EF;
+  --accent:#D98E2B; --danger:#C25B4A; --r:14px;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  display:flex; min-height:100vh;
+}
+
+nav.topnav{
+  width:220px; flex-shrink:0; background:var(--panel); border-right:1px solid var(--line);
+  padding:24px 16px; display:flex; flex-direction:column; gap:4px;
+  position:fixed; top:0; left:0; bottom:0; overflow-y:auto;
+}
+nav.topnav .brand{display:flex; align-items:center; gap:10px; padding:4px 8px 22px;}
+nav.topnav .brand .mark{width:32px; height:32px; border-radius:9px; background:var(--brand); color:var(--brand-ink); display:flex; align-items:center; justify-content:center; font-weight:700;}
+nav.topnav .brand .name{font-weight:700; font-size:17px;}
+nav.topnav a{
+  display:flex; align-items:center; padding:10px 12px; border-radius:10px;
+  color:var(--sub); font-size:14.5px; text-decoration:none; font-weight:600;
+}
+nav.topnav a.active{background:var(--brand-ink); color:var(--brand);}
+nav.topnav a:not(.active):hover{background:var(--line);}
+
+main{flex:0 1 auto; width:calc(100% - 220px); min-width:0; margin-left:220px; padding:28px 32px 60px; max-width:1080px;}
+header.pagehead{margin-bottom:22px;}
+header.pagehead h1{font-size:22px; margin:0 0 4px;}
+header.pagehead p{margin:0; color:var(--sub); font-size:14px;}
+#status{font-size:12.5px; color:var(--sub); margin:0 0 16px;}
+
+.cards{display:flex; gap:14px; margin-bottom:22px; flex-wrap:wrap;}
+.card{flex:1; min-width:150px; background:var(--panel); border:1px solid var(--line); border-radius:var(--r); padding:16px 18px;}
+.card .label{font-size:12.5px; color:var(--sub); margin-bottom:6px;}
+.card .value{font-size:21px; font-weight:700;}
+
+form{
+  background:var(--panel); border:1px solid var(--line); border-radius:var(--r);
+  padding:16px; display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; align-items:center;
+}
+input, select{
+  padding:9px 10px; border:1px solid var(--line); border-radius:8px; font-size:13.5px;
+  flex:1; min-width:130px; background:var(--bg);
+}
+.inputRupiah{
+  position:relative; display:flex; align-items:center;
+  flex:1; min-width:150px;
+}
+.inputRupiah .prefix{
+  position:absolute; left:11px; color:var(--sub); font-size:13.5px; pointer-events:none;
+}
+.inputRupiah input{
+  width:100%; padding-left:32px;
+}
+.hppBox{
+  flex:0 0 120px; min-width:0; text-align:left;
+  color:var(--sub); background:var(--bg); cursor:default;
+}
+button[type="submit"]{
+  padding:9px 18px; border:1px solid #D8D4CB; background:#FFFFFF; color:#1B2430;
+  border-radius:8px; cursor:pointer; font-weight:600; font-size:13.5px; box-shadow:0 1px 2px rgba(0,0,0,0.08);
+}
+button[type="submit"]:hover{background:#F0EEE9;}
+.fieldGroup{display:flex;flex:1 1 180px;min-width:150px;flex-direction:column;gap:6px;}
+.fieldGroup>label{display:block;color:var(--sub);font-size:12.5px;font-weight:600;line-height:1.35;}
+.fieldGroup>input,.fieldGroup>select{width:100%;min-width:0;flex:1;}
+.fieldGroup .inputRupiah{width:100%;min-width:0;flex:1;}
+.fieldGroup .inputRupiah input{width:100%;min-width:0;}
+
+table{width:100%; border-collapse:collapse; background:var(--panel); border:1px solid var(--line); border-radius:var(--r); overflow:hidden;}
+th, td{text-align:left; padding:12px 16px; font-size:13.5px;}
+th{color:var(--sub); font-weight:600; border-bottom:1px solid var(--line); font-size:12.5px;}
+td{border-bottom:1px solid var(--line);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--bg);}
+
+td input[type="text"]{
+  width:100%; min-width:80px; padding:6px 8px; font-size:13.5px;
+  border:1px solid var(--line); border-radius:6px; background:var(--panel);
+}
+td .inputRupiah{min-width:0; flex:none;}
+td .inputRupiah input{padding:6px 8px 6px 28px;}
+td .inputRupiah .prefix{left:8px;}
+
+.btnEdit, .btnRealisasi, .btnHapus{
+  padding:4px 10px; font-size:12px; border-radius:6px; border:none; cursor:pointer; margin-right:4px; font-weight:600;
+}
+.btnEdit, .btnRealisasi, .btnHapus{background:#FFFFFF;color:#1B2430;border:1px solid #D8D4CB;box-shadow:0 1px 2px rgba(0,0,0,0.08);}
+.btnEdit:hover, .btnRealisasi:hover, .btnHapus:hover{opacity:0.85;}
+
+@media (max-width:760px){
+  body{flex-direction:column;}
+  nav.topnav{position:static; width:100%; flex-direction:row; overflow-x:auto; padding:12px;}
+  nav.topnav .brand{display:none;}
+  main{margin-left:0; padding:20px 16px;}
+  form{flex-direction:column; align-items:stretch;}
+}
+
+/* tombol berbentuk ikon bulat/kotak, tanpa teks — monokrom hitam putih */
+.btnIcon{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:34px; height:34px; padding:0; border-radius:9px;
+  cursor:pointer; margin-right:6px; flex-shrink:0;
+  background:#FFFFFF; border:1px solid #D8D4CB; color:#1B2430;
+  box-shadow:0 1px 2px rgba(0,0,0,0.08);
+  transition:opacity .15s ease, transform .15s ease, background .15s ease;
+}
+.btnIcon svg{display:block; pointer-events:none;}
+.btnIcon:hover{background:#F0EEE9; transform:translateY(-1px);}
+.btnIcon:active{transform:translateY(0);}
+.btnIcon:focus-visible{outline:2px solid var(--ink); outline-offset:2px;}
+
+button[type="submit"].btnIcon.btnTambah{
+  width:40px; height:40px; position:relative;
+  background:#FFFFFF; border:1px solid #D8D4CB;
+}
+button[type="submit"].btnIcon.btnTambah::before,
+button[type="submit"].btnIcon.btnTambah::after{
+  content:""; position:absolute; background:#1B2430; border-radius:2px;
+}
+button[type="submit"].btnIcon.btnTambah::before{width:16px; height:3px;}
+button[type="submit"].btnIcon.btnTambah::after{width:3px; height:16px;}
+
+.btnIcon.btnEdit{color:#1B2430;}
+.btnIcon.btnHapus{color:#1B2430;}
+
+.bulkbar{display:flex; align-items:center; gap:10px; margin-bottom:12px;}
+.bulkbar span{font-size:12.5px; color:var(--sub);}
+.bulkbar .bulkSelectAll{display:inline-flex;align-items:center;gap:7px;color:var(--sub);font-size:12.5px;cursor:pointer;}
+.bulkbar .bulkSelectAll input{margin:0;}
+input[type="checkbox"]{width:16px; height:16px; cursor:pointer;}
+.btnIcon.btnRealisasi:disabled{opacity:0.35; cursor:not-allowed;}
+
+button[type="submit"].btnIcon{
+  width:40px;
+  height:40px;
+  padding:0;
+  background:#FFFFFF;
+  border:1px solid #D8D4CB;
+  color:#1B2430;
+}
+button[type="submit"].btnIcon:hover{
+  background:#F0EEE9;
+  opacity:1;
+}
+
+/* Tabel pesanan dibuat rapat agar muat pada lebar halaman. */
+.pesananTableScroll{width:100%;overflow-x:auto;border-radius:var(--r);}
+.tblPesanan{width:100%;min-width:940px;table-layout:fixed;}
+.tblPesanan th,.tblPesanan td{padding:9px 7px;font-size:12px;overflow-wrap:anywhere;}
+.tblPesanan th{font-size:11.5px;line-height:1.25;}
+.tblPesanan th:nth-child(1){width:4%;padding-left:3px;padding-right:3px;text-align:center;}
+.tblPesanan th:nth-child(2){width:12%;}
+.tblPesanan th:nth-child(3){width:8%;}
+.tblPesanan th:nth-child(4){width:15%;}
+.tblPesanan th:nth-child(5){width:5%;}
+.tblPesanan th:nth-child(6){width:9%;}
+.tblPesanan th:nth-child(7){width:10%;}
+.tblPesanan th:nth-child(8){width:9%;}
+.tblPesanan th:nth-child(9){width:8%;}
+.tblPesanan th:nth-child(10){width:5%;}
+.tblPesanan th:nth-child(11){width:7%;text-align:center;}
+.tblPesanan th:nth-child(12){width:8%;white-space:nowrap;}
+.tblPesanan .btnIcon{width:30px;height:30px;margin-right:3px;}
+.badge{ display:inline-block; padding:3px 10px; border-radius:100px; font-size:11px; font-weight:700; white-space:nowrap; }
+
+/* badge status jadi lebih ringkas & jelas */
+.badge{
+  display:inline-block; padding:3px 9px; border-radius:100px;
+  font-size:11.5px; font-weight:600;
+}
+.badge.bg-success{ background:#E4F3E9; color:#1F7A43; }
+.badge.bg-warning{ background:#FCEFDD; color:#B4700F; }
+
+.tblPesanan th.thPilihRealisasi{
+  width:4%;
+  text-align:center;
+  padding-left:3px;
+  padding-right:3px;
+}
+.tblPesanan .rowCheck{display:block;margin:0 auto;}
+.tblPesanan td.pesananCheckboxCell{position:sticky;left:0;z-index:2;width:38px;padding-left:3px;padding-right:3px;text-align:center;background:var(--panel);}
+.tblPesanan .pesananOrderCell{vertical-align:middle;}
+.tblPesanan .pesananGroupStart td{border-top:1px solid var(--line);}
+.pesananHint{margin:0 0 10px;color:var(--sub);font-size:12.5px;}
+.pesananUtama,.produkPesananRow{display:grid;gap:10px;align-items:center;}
+.pesananUtama{width:100%;grid-template-columns:repeat(3,minmax(0,1fr));}
+.pesananUtama .fieldGroup{min-width:0;}
+.produkPesananList{display:flex;flex-direction:column;gap:10px;width:100%;}
+.produkPesananRow{grid-template-columns:minmax(180px,2fr) minmax(100px,.8fr) minmax(90px,.7fr) minmax(120px,1fr) auto;width:100%;}
+.produkPesananRow input,.produkPesananRow select{width:100%;min-width:0;}
+.produkPesananRow .fieldGroup{min-width:0;}
+.pesananFormActions{display:flex;align-items:center;gap:10px;width:100%;}
+.btnTambahProduk,.btnHapusProduk{padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);cursor:pointer;font-weight:600;}
+.btnHapusProduk{padding:9px 12px;}
+.btnTambahProduk:hover,.btnHapusProduk:not(:disabled):hover{background:#F0EEE9;}
+.btnIcon.btnSubmitPesanan{flex:0 0 40px;width:40px;height:40px;}
+.btnHapusProduk:disabled{opacity:.4;cursor:not-allowed;}
+@media(max-width:760px){
+  .fieldGroup{width:100%;min-width:0;}
+  .pesananUtama{grid-template-columns:1fr;}
+  .produkPesananRow{grid-template-columns:1fr 1fr;}
+  .produkPesananRow .fieldGroup:first-child{grid-column:1/-1;}
+  .pesananFormActions{flex-direction:column;align-items:stretch;}
+}
+/* Label tersembunyi secara visual, tetap terbaca oleh pembaca layar */.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+.searchProduk{margin-bottom:12px;}.searchProduk label{display:block;margin-bottom:6px;color:var(--sub);font-size:13px;}.searchProduk input{width:100%;padding:10px 14px;border-radius:10px;border:1px solid #e2e8f0;font-size:14px;background-color:#fff;outline:none;}
+.stokRekap{margin:24px 0;}
+.stokRekapHeader{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;}
+.stokRekapHeader h2{margin:0 12px 4px 0;font-size:18px;}
+.stokRekapHeader p{margin:0;color:var(--sub);font-size:13px;}
+.stokRekapHeader label{margin-left:auto;color:var(--sub);font-size:13px;}
+.stokRekapHeader input{flex:0 0 170px;min-width:150px;}
+.stokTransaksiFilters{display:grid;grid-template-columns:minmax(190px,2fr) repeat(3,minmax(150px,1fr));gap:10px;margin:0 0 12px;}
+.stokTransaksiFilters .fieldGroup{margin:0;min-width:0;}
+.btnAksiStok{padding:6px 9px;margin:2px 4px 2px 0;font-size:12px;}
+.stokOpnameTools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:18px 0 24px;padding:16px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);}
+.stokOpnameTools>div{flex:1 1 100%;}
+.stokOpnameTools h2{margin:0 0 4px;font-size:18px;}
+.stokOpnameTools p{margin:0;color:var(--sub);font-size:13px;}
+.printOnly{display:none;}
+#formStok h2{flex:0 0 100%;margin:0 0 2px;font-size:18px;}
+main>h2{margin:24px 0 10px;font-size:18px;}
+.tableScroll{width:100%;overflow-x:auto;margin-bottom:22px;}
+.tableScroll table{min-width:850px;}
+.reportFilter{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin:0 0 12px;color:var(--sub);font-size:13px;}
+.reportFilter input{flex:0 0 180px;min-width:150px;}
+.btnDownload{padding:9px 14px;border:1px solid #D8D4CB;background:#FFFFFF;color:#1B2430;border-radius:8px;cursor:pointer;font-weight:600;font-size:13.5px;box-shadow:0 1px 2px rgba(0,0,0,0.08);}
+.btnDownload:hover:not(:disabled){background:#F0EEE9;}
+.btnDownload:disabled{opacity:.55;cursor:wait;}
+.kasPeriodFilter{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin:0 0 12px;color:var(--sub);font-size:13px;}
+.kasPeriodFilter input{flex:0 0 180px;min-width:150px;}
+.reportNote{color:var(--sub);font-size:12.5px;margin-top:0;}
+.dashboardFilter{margin-top:-8px;}
+.dashboardCharts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
+.chartCard{min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:2px;}
+.chartCard h2{font-size:17px;margin:0 0 4px;}
+.chartCard>p{font-size:12.5px;color:var(--sub);margin:0 0 10px;}
+.dashboardChart{width:100%;min-height:210px;}
+.dashboardChart svg{display:block;width:100%;height:auto;overflow:visible;}
+.chartGridLine{stroke:var(--line);stroke-width:1;}
+.chartAxisLabel,.chartProductLabel,.chartValueLabel{fill:var(--sub);font-family:inherit;font-size:11px;}
+.chartProductLabel{font-size:12px;}
+.chartValueLabel{fill:var(--ink);font-size:12px;font-weight:600;}
+.chartBar{transition:opacity .15s ease;}
+.chartBar:hover{opacity:.72;}
+.chartLegend{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-top:2px;}
+.chartLegend span{display:inline-flex;align-items:center;gap:6px;color:var(--sub);font-size:12px;}
+.chartLegend i{display:inline-block;width:10px;height:10px;border-radius:3px;}
+.chartEmpty{color:var(--sub);padding:18px 4px;}
+.statusProduk{display:inline-block;padding:4px 10px;border:1px solid #D8D4CB;border-radius:999px;background:#fff;color:#1B2430;font-size:12px;font-weight:600;}
+.statusProduk.nonaktif{background:#F0EEE9;color:#6B7280;}
+.btnStatusProduk{margin:0 6px;padding:8px 10px;border:1px solid #D8D4CB;border-radius:9px;background:#fff;color:#1B2430;font:inherit;font-size:12px;font-weight:600;cursor:pointer;}
+.btnStatusProduk:hover{background:#F0EEE9;}
+.pesananFilters{display:grid;grid-template-columns:minmax(220px,2fr) minmax(170px,1fr) minmax(170px,1fr);gap:12px;margin:0 0 14px;}
+.pesananFilters .fieldGroup{margin:0;}
+.pesananFilters label{display:block;margin-bottom:6px;color:var(--sub);font-size:13px;}
+.pesananSummaryRow{background:#F8F7F4;font-weight:600;}
+.pesananDetailRow td{font-size:13px;color:var(--sub);}
+.pesananDetailRow td{vertical-align:middle;}
+.pesananDetailRow td:nth-child(4),.pesananDetailRow td:first-child{color:var(--ink);}
+.pesananFilters input,.pesananFilters select{width:100%;}
+#formKas{margin-bottom:22px;}
+#formKas{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:start;}
+#formKas h2{grid-column:1/-1;margin:0 0 2px;font-size:18px;}
+#formKas .fieldGroup{min-width:0;}
+#formKas .fieldGroup>input,#formKas .fieldGroup>select,#formKas .inputRupiah{min-width:0;width:100%;}
+#formKas .kasRincianKas{grid-column:span 3;}
+.kasFormActions{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0;align-self:end;}
+.kasFormActions .btnTambahProduk{white-space:nowrap;}
+.kasFieldHint{min-height:14px;color:var(--sub);font-size:11px;line-height:1.25;}
+#formStok .hppBox{flex:0 0 140px;}
+@media(max-width:760px){
+  main{flex:0 1 auto;width:100%;max-width:none;}
+  .stokTransaksiFilters{grid-template-columns:1fr 1fr;}
+  .pesananFilters{grid-template-columns:1fr;}
+  .tblPesanan{min-width:940px;}
+  .dashboardCharts{grid-template-columns:1fr;}
+  .chartCard{padding:14px;}
+  .dashboardChart{min-height:170px;}
+  .stokRekapHeader label{margin-left:0;}
+  .stokRekapHeader input{flex:1;}
+  .kasPeriodFilter{justify-content:flex-start;}
+  .kasPeriodFilter input{flex:1;}
+  #formKas{grid-template-columns:repeat(2,minmax(0,1fr));}
+  #formKas .kasRincianKas{grid-column:1/-1;}
+  .kasFormActions{grid-column:1/-1;justify-content:flex-start;}
+}
+
+@media(max-width:480px){
+  #formKas{grid-template-columns:1fr;}
+  #formKas .kasRincianKas,.kasFormActions{grid-column:1;}
+}
+
+@media print{
+  @page{size:A4 landscape;margin:12mm;}
+  body.printMode>*:not(#areaCetakStokOpname){display:none!important;}
+  body.printMode #areaCetakStokOpname{display:block!important;color:#111;font:10pt Arial,sans-serif;}
+  #areaCetakStokOpname h1{margin:0 0 5px;font-size:18pt;}
+  #areaCetakStokOpname p{margin:3px 0 12px;font-size:9pt;}
+  #areaCetakStokOpname table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #555;}
+  #areaCetakStokOpname th,#areaCetakStokOpname td{padding:6px 7px;border:1px solid #777;color:#111;font-size:9pt;text-align:left;}
+  #areaCetakStokOpname th{background:#e8e8e8;font-weight:700;}
+  #areaCetakStokOpname td:nth-child(1),#areaCetakStokOpname td:nth-child(4),#areaCetakStokOpname td:nth-child(6){text-align:center;}
+  #areaCetakStokOpname .kolomIsi{height:27px;}
+}
+

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UsahaKu - Stok</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <nav class="topnav">
+    <div class="brand"><div class="mark">U</div><div class="name">UsahaKu</div></div>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="pesanan.html">Daftar Pesanan</a>
+    <a href="produk.html">Produk & Harga</a>
+    <a href="stok.html" class="active">Stok/Inventori</a>
+    <a href="laporan.html">Arus Kas</a>
+    <a href="laba-rugi.html">Laba Rugi</a>
+  </nav>
+
+  <main>
+    <header class="pagehead">
+      <h1>Stok / Inventori</h1>
+      <p>Catat barang masuk dan pantau jumlah stok serta nilai modal yang tersedia.</p>
+    </header>
+    <p id="status">Menghubungkan ke database...</p>
+
+    <form id="formStok">
+      <h2 id="judulFormStok">Catat Barang Masuk</h2>
+      <div class="fieldGroup"><label for="inputTanggal">Tanggal transaksi stok</label><input type="date" id="inputTanggal" required></div>
+      <div class="fieldGroup"><label for="selectProduk">Produk</label><select id="selectProduk" required></select></div>
+      <div class="fieldGroup"><label for="selectSumber">Jenis stok masuk</label><select id="selectSumber" required>
+        <option value="Manual">Pembelian / restok</option>
+        <option value="Saldo Awal">Saldo awal</option>
+      </select></div>
+      <div class="fieldGroup"><label for="inputQty">Jumlah barang masuk (qty)</label><input type="number" id="inputQty" required min="1"></div>
+      <div class="fieldGroup"><label for="inputHppStok">HPP aktual per unit</label><div class="inputRupiah"><span class="prefix">Rp</span><input type="text" id="inputHppStok" data-currency-input inputmode="decimal" placeholder="Pilih produk" required></div></div>
+      <button type="submit" class="btnIcon btnTambah" title="Simpan stok" aria-label="Simpan stok"></button>
+      <button type="button" id="btnBatalEditStok" class="btnTambahProduk" hidden>Batalkan edit</button>
+    </form>
+
+    <section class="stokOpnameTools">
+      <div>
+        <h2>Stock Opname</h2>
+        <p>Cetak daftar stok saat ini atau form pemeriksaan mingguan untuk diisi manual.</p>
+      </div>
+      <button type="button" id="btnCetakStokSaatIni" class="btnTambahProduk" disabled>Cetak stok semua produk</button>
+      <button type="button" id="btnCetakOpnameMingguan" class="btnTambahProduk" disabled>Cetak form opname mingguan</button>
+    </section>
+
+    <section class="stokRekap">
+      <div class="stokRekapHeader">
+        <div>
+          <h2>Rekap HPP Bulanan</h2>
+          <p>Rekap ini menghitung nilai modal dari stok awal dan pembelian pada bulan yang dipilih. Masukkan stok awal saat mulai mencatat persediaan.</p>
+        </div>
+        <label for="filterBulan">Bulan laporan</label>
+        <input type="month" id="filterBulan">
+      </div>
+      <div class="cards">
+        <div class="card"><div class="label">Persediaan Awal</div><div class="value" id="nilaiPersediaanAwal">-</div></div>
+        <div class="card"><div class="label">Pembelian Produk</div><div class="value" id="nilaiPembelian">-</div></div>
+        <div class="card"><div class="label">Persediaan Akhir</div><div class="value" id="nilaiPersediaanAkhir">-</div></div>
+        <div class="card"><div class="label">HPP Bulan Ini</div><div class="value" id="hppBulanan">-</div></div>
+      </div>
+    </section>
+
+    <h2>Stok Tersedia Saat Ini</h2>
+    <div class="tableScroll">
+    <table>
+      <thead><tr><th>Kode</th><th>Nama Produk</th><th>Qty Tersedia</th><th>HPP lapisan stok</th><th>Nilai Stok</th></tr></thead>
+      <tbody id="tabelStokSaatIni"></tbody>
+    </table>
+    </div>
+
+    <h2>Stok per Produk pada Akhir Bulan</h2>
+    <div class="tableScroll">
+    <table>
+      <thead>
+        <tr>
+          <th>Kode</th><th>Nama Produk</th><th>Stok Awal</th><th>Total Masuk</th><th>Total Keluar</th><th>Stok Tersedia</th><th>HPP rata-rata stok akhir</th><th>Nilai Persediaan</th>
+        </tr>
+      </thead>
+      <tbody id="tabelStok"></tbody>
+    </table>
+    </div>
+
+    <h2>Riwayat Transaksi Stok</h2>
+    <section class="stokTransaksiFilters" aria-label="Pencarian dan filter transaksi stok">
+      <div class="fieldGroup"><label for="cariTransaksiStok">Cari produk</label><input type="search" id="cariTransaksiStok" placeholder="Ketik nama atau kode produk"></div>
+      <div class="fieldGroup"><label for="filterJenisTransaksi">Jenis transaksi</label><select id="filterJenisTransaksi"><option value="">Semua jenis</option><option value="Masuk">Barang masuk</option><option value="Keluar">Barang keluar</option></select></div>
+      <div class="fieldGroup"><label for="filterTanggalMulai">Dari tanggal</label><input type="date" id="filterTanggalMulai"></div>
+      <div class="fieldGroup"><label for="filterTanggalAkhir">Sampai tanggal</label><input type="date" id="filterTanggalAkhir"></div>
+    </section>
+    <div class="tableScroll">
+    <table>
+      <thead><tr><th>Tanggal</th><th>Kode</th><th>Nama Produk</th><th>Jenis</th><th>Qty</th><th>HPP / Unit</th><th>Nilai</th><th>Sumber</th><th>Keterangan</th><th>Aksi</th></tr></thead>
+      <tbody id="tabelTransaksiStok"></tbody>
+    </table>
+    </div>
+  </main>
+
+  <section id="areaCetakStokOpname" class="printOnly" aria-hidden="true"></section>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/currency-input.js"></script>
+  <script src="js/stok.js"></script>
+</body>
+</html>
