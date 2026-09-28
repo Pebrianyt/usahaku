@@ -8,14 +8,16 @@
 </head>
 <body>
 
-  <nav class="topnav">
+  <nav class="topnav" aria-label="Navigasi utama">
     <div class="brand"><div class="mark">U</div><div class="name">UsahaKu</div></div>
-    <a href="dashboard.html">Dashboard</a>
-    <a href="pesanan.html" class="active">Daftar Pesanan</a>
-    <a href="produk.html">Produk & Harga</a>
-    <a href="stok.html">Stok/Inventori</a>
-    <a href="laporan.html">Arus Kas</a>
-    <a href="laba-rugi.html">Laba Rugi</a>
+    <ul class="navMenu">
+      <li><a href="dashboard.html"><svg class="navIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg><span>Dashboard</span></a></li>
+      <li><a href="master_data.html"><svg class="navIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M3.5 10h17M9 4.5v15"/></svg><span>Master Data</span></a></li>
+      <li><a href="persediaan.html"><svg class="navIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m12 3 8.5 4.5v9L12 21l-8.5-4.5v-9L12 3Z"/><path d="m3.8 7.7 8.2 4.5 8.2-4.5M12 12.2V21"/></svg><span>Persediaan</span></a></li>
+      <li><a href="daftar_pesanan.html" class="active"><svg class="navIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r=".8" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r=".8" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r=".8" fill="currentColor" stroke="none"/></svg><span>Daftar Pesanan</span></a></li>
+      <li><a href="arus_kas.html"><svg class="navIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 20V4M4 20h17M7 15l4-4 3 2 5-7"/><path d="M16 6h3v3"/></svg><span>Arus Kas</span></a></li>
+      <li><a href="laba_rugi.html"><svg class="navIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 20V4M4 20h17M7 15l4-4 3 2 5-7"/><path d="M16 6h3v3"/></svg><span>Laba Rugi</span></a></li>
+    </ul>
   </nav>
 
   <main>
@@ -24,7 +26,7 @@
         <p>Catat pesanan pelanggan, pantau pembayarannya, dan lihat modal serta keuntungan.</p>
     </header>
 
-    <p id="status">Menghubungkan ke database...</p>
+    <p id="status" role="status" aria-live="polite">Menghubungkan ke database...</p>
 
     <form id="formPesanan">
       <div class="pesananUtama">
@@ -54,7 +56,7 @@
       </div>
     </form>
 
-    <div class="bulkbar">
+    <section class="bulkbar" aria-label="Aksi pesanan terpilih">
       <label class="bulkSelectAll" for="checkAll">
         <input type="checkbox" id="checkAll" aria-label="Pilih semua pesanan pending">
         <span>Pilih semua</span>
@@ -63,7 +65,7 @@
       <button type="button" id="btnRealisasiTerpilih" class="btnIcon btnRealisasi" title="Tandai realisasi yang dipilih" disabled>
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
       </button>
-    </div>
+    </section>
 
     <section class="pesananFilters" aria-label="Pencarian dan filter pesanan">
       <div class="fieldGroup">
@@ -88,18 +90,18 @@
     <table class="tblPesanan">
       <thead>
         <tr>
-          <th class="thPilihRealisasi" aria-label="Pilih pesanan untuk realisasi"></th>
-          <th>No Pesanan</th>
-          <th>Tanggal</th>
-          <th>Produk</th>
-          <th>Qty</th>
-          <th>Total HPP<br>Produk</th>
-          <th>Total Penghasilan<br>Akhir</th>
-          <th>Total HPP<br>Pesanan</th>
-          <th>Profit<br>Penjualan</th>
-          <th>Margin</th>
-          <th title="Status pembayaran: sudah masuk (Realisasi) atau belum (Pending)">Status</th>
-          <th>Aksi</th>
+          <th scope="col" class="thPilihRealisasi" aria-label="Pilih pesanan untuk realisasi"></th>
+          <th scope="col">No Pesanan</th>
+          <th scope="col">Tanggal</th>
+          <th scope="col">Produk</th>
+          <th scope="col">Qty</th>
+          <th scope="col">Total HPP<br>Produk</th>
+          <th scope="col">Total Penghasilan<br>Akhir</th>
+          <th scope="col">Total HPP<br>Pesanan</th>
+          <th scope="col">Profit<br>Penjualan</th>
+          <th scope="col">Margin</th>
+          <th scope="col" title="Status pembayaran: sudah masuk (Realisasi) atau belum (Pending)">Status</th>
+          <th scope="col">Aksi</th>
         </tr>
       </thead>
       <tbody id="tabelPesanan"></tbody>
@@ -108,8 +110,8 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase-client.js"></script>
-  <script src="js/currency-input.js"></script>
-  <script src="js/pesanan.js"></script>
+  <script src="js/supabase_client.js"></script>
+  <script src="js/currency_input.js"></script>
+  <script src="js/daftar_pesanan.js"></script>
 </body>
 </html>

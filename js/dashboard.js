@@ -1,3 +1,4 @@
+// 1. Referensi elemen dan state ringkasan.
 const statusEl = document.getElementById('status');
 const filterBulanEl = document.getElementById('filterBulanDashboard');
 let semuaPesanan = [];
@@ -7,7 +8,9 @@ let semuaAlokasiStok = [];
 let semuaTransaksiKas = [];
 
 const warnaGrafik = ['#6E9B66', '#D98E2B', '#5385A6'];
+// Memformat uang.
 const formatUang = nilai => 'Rp ' + Number(nilai || 0).toLocaleString('id-ID', { maximumFractionDigits: 0 });
+// Memformat angka besar dengan bentuk singkat.
 const formatPendek = nilai => {
   const abs = Math.abs(nilai);
   if (abs >= 1_000_000_000) return `${(nilai / 1_000_000_000).toLocaleString('id-ID', { maximumFractionDigits: 1 })} M`; 
@@ -16,11 +19,14 @@ const formatPendek = nilai => {
   return String(Math.round(nilai));
 };
 
+// 2. Helper periode dan pengambilan data.
+// Menentukan bulan berjalan dalam format YYYY-MM.
 function bulanSekarang() {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 }
 
+// Menyusun daftar bulan terakhir.
 function daftarBulanTerakhir(bulanAkhir, jumlah = 12) {
   const [tahun, bulan] = bulanAkhir.split('-').map(Number);
   return Array.from({ length: jumlah }, (_, index) => {
@@ -32,12 +38,14 @@ function daftarBulanTerakhir(bulanAkhir, jumlah = 12) {
   });
 }
 
+// Membentuk rentang bulan.
 function rentangBulan(bulan) {
   const [tahun, nomorBulan] = bulan.split('-').map(Number);
   const hariAkhir = new Date(tahun, nomorBulan, 0).getDate();
   return { awal: `${bulan}-01`, akhir: `${bulan}-${String(hariAkhir).padStart(2, '0')}` };
 }
 
+// Mengambil seluruh baris dari tabel Supabase secara bertahap.
 async function ambilSemua(tabel, kolom) {
   const semua = [];
   const ukuranHalaman = 1000;
@@ -52,6 +60,8 @@ async function ambilSemua(tabel, kolom) {
   return { data: semua, error: null };
 }
 
+// 3. Perhitungan pesanan, HPP, dan saldo.
+// Mengelompokkan pesanan berdasarkan kunci yang relevan.
 function kelompokkanPesanan(hppPerPesanan) {
   const kelompok = new Map();
   semuaPesanan.forEach(row => {
@@ -78,6 +88,7 @@ function kelompokkanPesanan(hppPerPesanan) {
   return Array.from(kelompok.values());
 }
 
+// Menyusun peta HPP untuk setiap nomor pesanan.
 function buatPetaHppPesanan() {
   const pesananById = new Map(semuaPesanan.map(item => [String(item.id), item]));
   const hppPerKeluar = new Map();
@@ -96,6 +107,8 @@ function buatPetaHppPesanan() {
   return hppPerPesanan;
 }
 
+// 4. Render grafik dashboard.
+// Membuat elemen SVG beserta atributnya.
 function svgNode(tag, attrs = {}, text = '') {
   const element = document.createElementNS('http://www.w3.org/2000/svg', tag);
   Object.entries(attrs).forEach(([name, value]) => element.setAttribute(name, value));
@@ -103,6 +116,7 @@ function svgNode(tag, attrs = {}, text = '') {
   return element;
 }
 
+// Menggambar grafik berkala untuk omzet, pesanan, atau arus kas.
 function renderGrafikKelompok(id, labels, series, compact = false) {
   const container = document.getElementById(id);
   container.replaceChildren();
@@ -153,6 +167,7 @@ function renderGrafikKelompok(id, labels, series, compact = false) {
   container.appendChild(legend);
 }
 
+// Menampilkan lima produk dengan jumlah barang keluar tertinggi.
 function renderGrafikPareto(daftar) {
   const container = document.getElementById('grafikProdukKeluar');
   container.replaceChildren();
@@ -182,6 +197,7 @@ function renderGrafikPareto(daftar) {
   container.appendChild(svg);
 }
 
+// Menghitung metrik bulan terpilih dan memperbarui kartu serta grafik.
 function renderDashboard() {
   const bulan = filterBulanEl.value;
   if (!bulan) return;
@@ -268,6 +284,8 @@ function renderDashboard() {
     (fifoBelumLengkap ? ' Sebagian HPP pesanan belum lengkap, sehingga angka laba perlu diperiksa.' : '');
 }
 
+// 5. Memuat data dan memasang event filter.
+// Mengambil data ringkasan Supabase lalu merender dashboard.
 async function muatDashboard() {
   statusEl.textContent = 'Memuat data pesanan, produk, stok, dan kas...';
   const hasil = await Promise.all([
@@ -287,5 +305,6 @@ async function muatDashboard() {
 }
 
 filterBulanEl.value = bulanSekarang();
+// Menyesuaikan data atau tampilan saat pilihan berubah.
 filterBulanEl.addEventListener('change', renderDashboard);
 muatDashboard();

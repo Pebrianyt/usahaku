@@ -1,3 +1,4 @@
+// 1. Referensi elemen halaman dan state transaksi kas.
 const statusEl = document.getElementById('status');
 const tabelEl = document.getElementById('tabelKas');
 const formEl = document.getElementById('formKas');
@@ -15,24 +16,30 @@ const kategoriPerJenis = {
   Keluar: ['Pembelian Stok', 'Biaya Operasional', 'Pengambilan Pribadi', 'Lainnya']
 };
 
+// 2. Helper format, tanggal, kategori, dan tabel.
+// Memformat rupiah.
 function formatRupiah(angka) {
   return 'Rp ' + Number(angka || 0).toLocaleString('id-ID', { maximumFractionDigits: 2 });
 }
 
+// Menghasilkan tanggal lokal dalam format YYYY-MM-DD.
 function tanggalLokal(date = new Date()) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 }
 
+// Menentukan batas awal bulan.
 function awalBulan(bulan) {
   return `${bulan}-01`;
 }
 
+// Menentukan batas akhir bulan.
 function akhirBulan(bulan) {
   const [tahun, nomorBulan] = bulan.split('-').map(Number);
   const hari = new Date(tahun, nomorBulan, 0).getDate();
   return `${bulan}-${String(hari).padStart(2, '0')}`;
 }
 
+// Membuat sel tabel dan memasukkan nilai teks dengan aman.
 function tambahSel(row, value) {
   const cell = document.createElement('td');
   cell.textContent = value ?? '-';
@@ -40,6 +47,7 @@ function tambahSel(row, value) {
   return cell;
 }
 
+// Memilih nama kategori yang akan ditampilkan pada riwayat kas.
 function kategoriUntukTampilan(row) {
   if (row.kategori) return row.kategori;
   if (row.jenis === 'Saldo Awal') return 'Modal Awal';
@@ -49,6 +57,7 @@ function kategoriUntukTampilan(row) {
   return 'Belum dikategorikan';
 }
 
+// Mengisi pilihan kategori sesuai jenis transaksi yang aktif.
 function aturKategoriKas(pilihan = '') {
   const pilihanValid = kategoriPerJenis[jenisEl.value] || [];
   kategoriEl.replaceChildren();
@@ -80,6 +89,7 @@ function aturKategoriKas(pilihan = '') {
   document.getElementById('petunjukKategoriKas').textContent = petunjuk[kategoriEl.value] || '';
 }
 
+// Mengunci opsi saldo awal jika catatan saldo awal sudah ada.
 function perbaruiSaldoAwalTersedia() {
   const optionSaldoAwal = Array.from(jenisEl.options).find(option => option.value === 'Saldo Awal');
   const saldoAwalSudahAda = transaksiKas.some(row =>
@@ -92,6 +102,8 @@ function perbaruiSaldoAwalTersedia() {
   }
 }
 
+// 3. Render ringkasan dan riwayat kas.
+// Merender ringkasan.
 function renderRingkasan() {
   const bulan = filterBulanEl.value;
   if (!bulan) return;
@@ -127,6 +139,7 @@ function renderRingkasan() {
   renderTabel(transaksiPeriode);
 }
 
+// Menampilkan daftar transaksi kas berdasarkan tanggal terbaru.
 function renderTabel(daftar) {
   tabelEl.replaceChildren();
   daftar.slice().sort((a, b) => b.tanggal.localeCompare(a.tanggal) || Number(b.id) - Number(a.id))
@@ -165,6 +178,8 @@ function renderTabel(daftar) {
   }
 }
 
+// 4. Muat dan simpan data kas.
+// Mengambil transaksi kas lalu memperbarui ringkasan dan riwayat.
 async function muatKas() {
   statusEl.textContent = 'Memuat data arus kas...';
   const semua = [];
@@ -189,6 +204,7 @@ async function muatKas() {
   statusEl.textContent = `${transaksiKas.length} transaksi kas tercatat. ${statusSaldoAwal.replace('Saldo awal', 'Modal awal usaha')}`;
 }
 
+// Menghapus state edit dan memulihkan form transaksi kas.
 function batalEditKas() {
   transaksiDieditId = null;
   formEl.reset();
@@ -203,13 +219,18 @@ function batalEditKas() {
   submit.setAttribute('aria-label', 'Simpan transaksi');
 }
 
+// 5. Event UI dan inisialisasi halaman.
+// Menyesuaikan data atau tampilan saat pilihan berubah.
 jenisEl.addEventListener('change', () => {
   aturKategoriKas();
   perbaruiSaldoAwalTersedia();
 });
+// Menyesuaikan data atau tampilan saat pilihan berubah.
 filterBulanEl.addEventListener('change', renderRingkasan);
+// Menangani aksi pengguna pada tombol atau baris yang dipilih.
 tombolBatalEdit.addEventListener('click', batalEditKas);
 
+// Menangani aksi pengguna pada tombol atau baris yang dipilih.
 tabelEl.addEventListener('click', async event => {
   const tombol = event.target.closest('button[data-aksi]');
   if (!tombol) return;
@@ -250,6 +271,7 @@ tabelEl.addEventListener('click', async event => {
   if (batalkanFormEdit) batalEditKas();
 });
 
+// Memvalidasi lalu menyimpan data dari form.
 formEl.addEventListener('submit', async event => {
   event.preventDefault();
   const tanggal = document.getElementById('inputTanggal').value;

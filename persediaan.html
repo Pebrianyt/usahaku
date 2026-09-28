@@ -8,14 +8,16 @@
 </head>
 <body>
 
-  <nav class="topnav">
+  <nav class="topnav" aria-label="Navigasi utama">
     <div class="brand"><div class="mark">U</div><div class="name">UsahaKu</div></div>
-    <a href="dashboard.html">Dashboard</a>
-    <a href="pesanan.html">Daftar Pesanan</a>
-    <a href="produk.html">Produk & Harga</a>
-    <a href="stok.html" class="active">Stok/Inventori</a>
-    <a href="laporan.html">Arus Kas</a>
-    <a href="laba-rugi.html">Laba Rugi</a>
+    <ul class="navMenu">
+      <li><a href="dashboard.html"><svg class="navIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg><span>Dashboard</span></a></li>
+      <li><a href="master_data.html"><svg class="navIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M3.5 10h17M9 4.5v15"/></svg><span>Master Data</span></a></li>
+      <li><a href="persediaan.html" class="active"><svg class="navIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m12 3 8.5 4.5v9L12 21l-8.5-4.5v-9L12 3Z"/><path d="m3.8 7.7 8.2 4.5 8.2-4.5M12 12.2V21"/></svg><span>Persediaan</span></a></li>
+      <li><a href="daftar_pesanan.html"><svg class="navIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r=".8" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r=".8" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r=".8" fill="currentColor" stroke="none"/></svg><span>Daftar Pesanan</span></a></li>
+      <li><a href="arus_kas.html"><svg class="navIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 20V4M4 20h17M7 15l4-4 3 2 5-7"/><path d="M16 6h3v3"/></svg><span>Arus Kas</span></a></li>
+      <li><a href="laba_rugi.html"><svg class="navIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 20V4M4 20h17M7 15l4-4 3 2 5-7"/><path d="M16 6h3v3"/></svg><span>Laba Rugi</span></a></li>
+    </ul>
   </nav>
 
   <main>
@@ -23,7 +25,7 @@
       <h1>Stok / Inventori</h1>
       <p>Catat barang masuk dan pantau jumlah stok serta nilai modal yang tersedia.</p>
     </header>
-    <p id="status">Menghubungkan ke database...</p>
+    <p id="status" role="status" aria-live="polite">Menghubungkan ke database...</p>
 
     <form id="formStok">
       <h2 id="judulFormStok">Catat Barang Masuk</h2>
@@ -57,18 +59,18 @@
         <label for="filterBulan">Bulan laporan</label>
         <input type="month" id="filterBulan">
       </div>
-      <div class="cards">
-        <div class="card"><div class="label">Persediaan Awal</div><div class="value" id="nilaiPersediaanAwal">-</div></div>
-        <div class="card"><div class="label">Pembelian Produk</div><div class="value" id="nilaiPembelian">-</div></div>
-        <div class="card"><div class="label">Persediaan Akhir</div><div class="value" id="nilaiPersediaanAkhir">-</div></div>
-        <div class="card"><div class="label">HPP Bulan Ini</div><div class="value" id="hppBulanan">-</div></div>
-      </div>
+      <section class="cards" aria-label="Ringkasan metrik">
+        <article class="card"><h2 class="label">Persediaan Awal</h2><div class="value" id="nilaiPersediaanAwal">-</div></article>
+        <article class="card"><h2 class="label">Pembelian Produk</h2><div class="value" id="nilaiPembelian">-</div></article>
+        <article class="card"><h2 class="label">Persediaan Akhir</h2><div class="value" id="nilaiPersediaanAkhir">-</div></article>
+        <article class="card"><h2 class="label">HPP Bulan Ini</h2><div class="value" id="hppBulanan">-</div></article>
+      </section>
     </section>
 
     <h2>Stok Tersedia Saat Ini</h2>
     <div class="tableScroll">
     <table>
-      <thead><tr><th>Kode</th><th>Nama Produk</th><th>Qty Tersedia</th><th>HPP lapisan stok</th><th>Nilai Stok</th></tr></thead>
+      <thead><tr><th scope="col">Kode</th><th scope="col">Nama Produk</th><th scope="col">Qty Tersedia</th><th scope="col">HPP lapisan stok</th><th scope="col">Nilai Stok</th></tr></thead>
       <tbody id="tabelStokSaatIni"></tbody>
     </table>
     </div>
@@ -78,7 +80,7 @@
     <table>
       <thead>
         <tr>
-          <th>Kode</th><th>Nama Produk</th><th>Stok Awal</th><th>Total Masuk</th><th>Total Keluar</th><th>Stok Tersedia</th><th>HPP rata-rata stok akhir</th><th>Nilai Persediaan</th>
+          <th scope="col">Kode</th><th scope="col">Nama Produk</th><th scope="col">Stok Awal</th><th scope="col">Total Masuk</th><th scope="col">Total Keluar</th><th scope="col">Stok Tersedia</th><th scope="col">HPP rata-rata stok akhir</th><th scope="col">Nilai Persediaan</th>
         </tr>
       </thead>
       <tbody id="tabelStok"></tbody>
@@ -94,17 +96,17 @@
     </section>
     <div class="tableScroll">
     <table>
-      <thead><tr><th>Tanggal</th><th>Kode</th><th>Nama Produk</th><th>Jenis</th><th>Qty</th><th>HPP / Unit</th><th>Nilai</th><th>Sumber</th><th>Keterangan</th><th>Aksi</th></tr></thead>
+      <thead><tr><th scope="col">Tanggal</th><th scope="col">Kode</th><th scope="col">Nama Produk</th><th scope="col">Jenis</th><th scope="col">Qty</th><th scope="col">HPP / Unit</th><th scope="col">Nilai</th><th scope="col">Sumber</th><th scope="col">Keterangan</th><th scope="col">Aksi</th></tr></thead>
       <tbody id="tabelTransaksiStok"></tbody>
     </table>
     </div>
   </main>
 
-  <section id="areaCetakStokOpname" class="printOnly" aria-hidden="true"></section>
+  <div id="areaCetakStokOpname" class="printOnly" aria-hidden="true"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase-client.js"></script>
-  <script src="js/currency-input.js"></script>
-  <script src="js/stok.js"></script>
+  <script src="js/supabase_client.js"></script>
+  <script src="js/currency_input.js"></script>
+  <script src="js/persedian.js"></script>
 </body>
 </html>

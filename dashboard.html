@@ -8,14 +8,16 @@
 </head>
 <body>
 
-  <nav class="topnav">
+  <nav class="topnav" aria-label="Navigasi utama">
     <div class="brand"><div class="mark">U</div><div class="name">UsahaKu</div></div>
-    <a href="dashboard.html" class="active">Dashboard</a>
-    <a href="pesanan.html">Daftar Pesanan</a>
-    <a href="produk.html">Produk & Harga</a>
-    <a href="stok.html">Stok/Inventori</a>
-    <a href="laporan.html">Arus Kas</a>
-    <a href="laba-rugi.html">Laba Rugi</a>
+    <ul class="navMenu">
+      <li><a href="dashboard.html" class="active"><svg class="navIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg><span>Dashboard</span></a></li>
+      <li><a href="master_data.html"><svg class="navIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M3.5 10h17M9 4.5v15"/></svg><span>Master Data</span></a></li>
+      <li><a href="persediaan.html"><svg class="navIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m12 3 8.5 4.5v9L12 21l-8.5-4.5v-9L12 3Z"/><path d="m3.8 7.7 8.2 4.5 8.2-4.5M12 12.2V21"/></svg><span>Persediaan</span></a></li>
+      <li><a href="daftar_pesanan.html"><svg class="navIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r=".8" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r=".8" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r=".8" fill="currentColor" stroke="none"/></svg><span>Daftar Pesanan</span></a></li>
+      <li><a href="arus_kas.html"><svg class="navIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 20V4M4 20h17M7 15l4-4 3 2 5-7"/><path d="M16 6h3v3"/></svg><span>Arus Kas</span></a></li>
+      <li><a href="laba_rugi.html"><svg class="navIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 20V4M4 20h17M7 15l4-4 3 2 5-7"/><path d="M16 6h3v3"/></svg><span>Laba Rugi</span></a></li>
+    </ul>
   </nav>
 
   <main>
@@ -23,23 +25,23 @@
       <h1>Dashboard</h1>
       <p>Pantau pesanan, omzet, laba, saldo kas, dan produk terlaris dalam satu halaman.</p>
     </header>
-    <div class="reportFilter dashboardFilter">
+    <section class="reportFilter dashboardFilter" aria-label="Filter periode dashboard">
       <label for="filterBulanDashboard">Pilih bulan</label>
       <input type="month" id="filterBulanDashboard">
-    </div>
-    <p id="status">Menghubungkan ke database...</p>
+    </section>
+    <p id="status" role="status" aria-live="polite">Menghubungkan ke database...</p>
 
-    <div class="cards">
-      <div class="card"><div class="label">Jumlah Nomor Pesanan</div><div class="value" id="totalPesanan">-</div></div>
-      <div class="card"><div class="label">Omzet Terealisasi</div><div class="value" id="omzetRealisasi">-</div></div>
-      <div class="card"><div class="label">Omzet Pesanan Pending</div><div class="value" id="omzetPotential">-</div></div>
-      <div class="card"><div class="label">Total Omzet Proyeksi</div><div class="value" id="omset">-</div></div>
-      <div class="card"><div class="label">Laba Bersih Terealisasi</div><div class="value" id="labaBersihRealisasi">-</div></div>
-      <div class="card"><div class="label">Laba Bersih Proyeksi</div><div class="value" id="labaBersihProyeksi">-</div></div>
-      <div class="card"><div class="label">Saldo Kas Terkini</div><div class="value" id="saldoKas">-</div></div>
-    </div>
+    <section class="cards" aria-label="Ringkasan metrik">
+      <article class="card"><h2 class="label">Jumlah Nomor Pesanan</h2><div class="value" id="totalPesanan">-</div></article>
+      <article class="card"><h2 class="label">Omzet Terealisasi</h2><div class="value" id="omzetRealisasi">-</div></article>
+      <article class="card"><h2 class="label">Omzet Pesanan Pending</h2><div class="value" id="omzetPotential">-</div></article>
+      <article class="card"><h2 class="label">Total Omzet Proyeksi</h2><div class="value" id="omset">-</div></article>
+      <article class="card"><h2 class="label">Laba Bersih Terealisasi</h2><div class="value" id="labaBersihRealisasi">-</div></article>
+      <article class="card"><h2 class="label">Laba Bersih Proyeksi</h2><div class="value" id="labaBersihProyeksi">-</div></article>
+      <article class="card"><h2 class="label">Saldo Kas Terkini</h2><div class="value" id="saldoKas">-</div></article>
+    </section>
 
-    <section class="dashboardCharts">
+    <section class="dashboardCharts" aria-label="Grafik ringkasan dashboard">
       <article class="chartCard">
         <h2>Jumlah Pesanan per Bulan</h2>
         <p>Nomor pesanan yang sama dihitung satu kali, meski berisi beberapa produk.</p>
@@ -64,7 +66,7 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase-client.js"></script>
+  <script src="js/supabase_client.js"></script>
   <script src="js/dashboard.js"></script>
 </body>
 </html>

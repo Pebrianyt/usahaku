@@ -1,3 +1,4 @@
+// 1. Referensi elemen dan state laporan.
 const statusEl = document.getElementById('status');
 const filterBulanEl = document.getElementById('filterBulanLabaRugi');
 const unduhPdfBtn = document.getElementById('unduhPdf');
@@ -9,25 +10,31 @@ let transaksiStok = [];
 let alokasiStok = [];
 let transaksiKas = [];
 
+// 2. Helper format, tanggal, dan akses data.
+// Memformat rupiah.
 function formatRupiah(nilai) {
   return 'Rp ' + Number(nilai || 0).toLocaleString('id-ID', { maximumFractionDigits: 2 });
 }
 
+// Memformat persen.
 function formatPersen(nilai, pembagi) {
   return pembagi ? `${(nilai / pembagi * 100).toLocaleString('id-ID', { maximumFractionDigits: 2 })}%` : '0%';
 }
 
+// Menentukan bulan berjalan dalam format YYYY-MM.
 function bulanSekarang() {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 }
 
+// Menentukan batas bulan.
 function batasBulan(bulan) {
   const [tahun, nomorBulan] = bulan.split('-').map(Number);
   const akhir = new Date(tahun, nomorBulan, 0).getDate();
   return { awal: `${bulan}-01`, akhir: `${bulan}-${String(akhir).padStart(2, '0')}` };
 }
 
+// Mengambil seluruh baris dari tabel Supabase secara bertahap.
 async function ambilSemua(tabel, kolom, orderKolom = 'id') {
   const semua = [];
   const ukuranHalaman = 1000;
@@ -42,6 +49,8 @@ async function ambilSemua(tabel, kolom, orderKolom = 'id') {
   return { data: semua, error: null };
 }
 
+// 3. Perhitungan omzet, HPP, dan biaya.
+// Menyusun data HPP berdasarkan alokasi stok untuk periode laporan.
 function buatDataHpp(awal, akhir) {
   const transaksiById = new Map(transaksiStok.map(item => [String(item.id), item]));
   const pesananById = new Map(pesanan.map(item => [String(item.id), item]));
@@ -82,6 +91,7 @@ function buatDataHpp(awal, akhir) {
   return { nilaiPerPesanan, lengkapPerPesanan, hppBulan };
 }
 
+// Menghitung omzet, HPP, dan profit setiap grup pesanan pada periode laporan.
 function hitungOmzet(awal, akhir, hppData) {
   const kelompok = new Map();
   pesanan.forEach(item => {
@@ -131,6 +141,7 @@ function hitungOmzet(awal, akhir, hppData) {
   return ringkasan;
 }
 
+// Menghitung biaya operasional.
 function hitungBiayaOperasional(awal, akhir) {
   const biaya = transaksiKas.filter(item =>
     item.jenis === 'Keluar' &&
@@ -148,6 +159,8 @@ function hitungBiayaOperasional(awal, akhir) {
   return jumlah;
 }
 
+// 4. Render tabel, ringkasan, dan dokumen PDF.
+// Menampilkan baris rincian laporan atau pesan saat data kosong.
 function renderRincian(tbody, barisData, jumlahKolom, pesanKosong) {
   tbody.replaceChildren();
   if (barisData.length === 0) {
@@ -170,6 +183,7 @@ function renderRincian(tbody, barisData, jumlahKolom, pesanKosong) {
   });
 }
 
+// Merender laporan.
 function renderLaporan() {
   const bulan = filterBulanEl.value;
   if (!bulan) return;
@@ -206,10 +220,12 @@ function renderLaporan() {
     : `Laporan ${namaBulan} ${tahun} dimuat. HPP semua pesanan tercatat lengkap.`;
 }
 
+// Mengambil teks ringkasan dari elemen yang dipakai saat membuat PDF.
 function nilaiTeks(id) {
   return document.getElementById(id)?.textContent?.trim() || '-';
 }
 
+// Mengunduh laporan pdf.
 function unduhLaporanPdf() {
   if (!window.jspdf?.jsPDF) {
     statusEl.textContent = 'Fitur PDF belum termuat. Periksa koneksi internet lalu muat ulang halaman.';
@@ -279,6 +295,7 @@ function unduhLaporanPdf() {
     rowY += 10;
   });
 
+// Menggambar ringkasan margin aktual dan proyeksi pada PDF.
   const buatKotakMargin = (y, judul, aktual, proyeksi) => {
     doc.setFillColor(247, 245, 241);
     doc.setDrawColor(231, 227, 219);
@@ -329,6 +346,8 @@ function unduhLaporanPdf() {
   doc.save(`Laporan-Laba-Rugi-${bulan}.pdf`);
 }
 
+// 5. Memuat data dan memasang event laporan.
+// Mengambil pesanan, stok, alokasi, dan kas untuk laporan laba rugi.
 async function muatData() {
   statusEl.textContent = 'Memuat pesanan, stok, dan transaksi kas...';
   const hasil = await Promise.all([
@@ -348,6 +367,8 @@ async function muatData() {
 }
 
 filterBulanEl.value = bulanSekarang();
+// Menyesuaikan data atau tampilan saat pilihan berubah.
 filterBulanEl.addEventListener('change', renderLaporan);
+// Menangani aksi pengguna pada tombol atau baris yang dipilih.
 unduhPdfBtn.addEventListener('click', unduhLaporanPdf);
 muatData();

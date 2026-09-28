@@ -1,7 +1,8 @@
 // ============================================================================
-// FILE: usahaku/js/pesanan.js
+// FILE: usahaku/js/daftar_pesanan.js
 // ============================================================================
 
+// 1. State halaman dan data pesanan.
 let listPesanan = [];
 let mapProduk = {};
 let daftarProduk = [];
@@ -10,22 +11,28 @@ let daftarTransaksiStok = [];
 let daftarAlokasiStok = [];
 let pesananSedangDiedit = null;
 
+// Menormalkan teks agar pencarian nomor pesanan konsisten.
 const normalisasiTeks = nilai => String(nilai || '').trim().toLocaleLowerCase('id-ID');
 
+// 2. Helper harga, stok FIFO, dan form produk.
+// Memformat rupiah.
 function formatRupiah(angka) {
   if (angka === null || angka === undefined || angka === '' || isNaN(angka)) return '';
   return 'Rp ' + Number(angka).toLocaleString('id-ID');
 }
 
+// Mengubah nilai teks menjadi angka.
 function parseNumber(val) {
   if (typeof val === 'number') return val;
   return Number(val) || 0;
 }
 
+// Menghitung ulang nilai baris saat produk atau kuantitas berubah.
 function updateHargaJualOtomatis(baris) {
   hitungEstimasiHppFIFO();
 }
 
+// Menghitung estimasi HPP pesanan berdasarkan alokasi FIFO.
 function hitungEstimasiHppFIFO() {
   const tanggalPesanan = document.getElementById('inputTanggal').value || new Date().toISOString().slice(0, 10);
   const transaksiMap = new Map(daftarTransaksiStok.map(item => [String(item.id), item]));
@@ -76,12 +83,14 @@ function hitungEstimasiHppFIFO() {
   });
 }
 
+// Merender dropdown produk.
 function renderDropdownProduk(dataProduk) {
   daftarProduk = dataProduk || [];
   document.getElementById('produkPesananList').innerHTML = '';
   tambahBarisProduk();
 }
 
+// Menambahkan satu baris produk dengan pilihan, kuantitas, dan aksi hapus.
 function tambahBarisProduk(kodeAwal = null, qtyAwal = 1) {
   const container = document.getElementById('produkPesananList');
   const baris = document.createElement('div');
@@ -161,16 +170,19 @@ function tambahBarisProduk(kodeAwal = null, qtyAwal = 1) {
   btnHapus.className = 'btnHapusProduk';
   btnHapus.textContent = 'Hapus';
   btnHapus.title = 'Hapus produk dari pesanan';
+// Menangani aksi pengguna pada tombol atau baris yang dipilih.
   btnHapus.addEventListener('click', () => {
     baris.remove();
     perbaruiTombolHapusProduk();
   });
 
+// Menyesuaikan data atau tampilan saat pilihan berubah.
   selectProduk.addEventListener('change', () => {
     const option = selectProduk.options[selectProduk.selectedIndex];
     inputHpp.value = option.value ? formatRupiah(Number(option.dataset.hpp || 0)) : '';
     updateHargaJualOtomatis(baris);
   });
+// Menangani perubahan nilai saat pengguna mengetik.
   inputQty.addEventListener('input', () => updateHargaJualOtomatis(baris));
 
   btnHapus.setAttribute('aria-label', 'Hapus produk dari pesanan');
@@ -183,6 +195,7 @@ function tambahBarisProduk(kodeAwal = null, qtyAwal = 1) {
   perbaruiTombolHapusProduk();
 }
 
+// Memperbarui tombol hapus produk.
 function perbaruiTombolHapusProduk() {
   const barisProduk = document.querySelectorAll('.produkPesananRow');
   barisProduk.forEach(baris => {
@@ -191,6 +204,7 @@ function perbaruiTombolHapusProduk() {
   hitungEstimasiHppFIFO();
 }
 
+// Menyelaraskan checkbox, jumlah pilihan, dan tombol aksi massal.
 function updateBulkBar() {
   const checked = document.querySelectorAll('.rowCheck:checked');
   const countEl = document.getElementById('bulkCount');
@@ -204,6 +218,8 @@ function updateBulkBar() {
   checkAll.checked = semuaCheckbox.length > 0 && Array.from(semuaCheckbox).every(cb => cb.checked);
 }
 
+// 3. Pengelompokan data dan render tabel.
+// Mengelompokkan pesanan berdasarkan kunci yang relevan.
 function kelompokkanPesanan(dataPesanan) {
   const groups = new Map();
   dataPesanan.forEach(item => {
@@ -235,6 +251,7 @@ function kelompokkanPesanan(dataPesanan) {
   }).sort((a, b) => b.tanggal.localeCompare(a.tanggal) || a.noPesanan.localeCompare(b.noPesanan));
 }
 
+// Membuat elemen sel tabel dan mengisi teksnya.
 function tambahCell(row, teks, className = '') {
   const td = document.createElement('td');
   td.textContent = teks;
@@ -243,6 +260,7 @@ function tambahCell(row, teks, className = '') {
   return td;
 }
 
+// Membuat sel tabel yang menggabungkan beberapa baris.
 function tambahCellGabung(row, teks, jumlahBaris, className = '') {
   const cell = tambahCell(row, teks, className);
   if (jumlahBaris > 1) cell.rowSpan = jumlahBaris;
@@ -250,6 +268,7 @@ function tambahCellGabung(row, teks, jumlahBaris, className = '') {
   return cell;
 }
 
+// Membuat tombol aksi pesanan.
 function tombolAksiPesanan(className, title, svg) {
   const button = document.createElement('button');
   button.type = 'button';
@@ -260,6 +279,7 @@ function tombolAksiPesanan(className, title, svg) {
   return button;
 }
 
+// Merender tabel pesanan.
 function renderTabelPesanan(dataPesanan) {
   const tbody = document.getElementById('tabelPesanan');
   if (!tbody) return;
@@ -300,6 +320,7 @@ function renderTabelPesanan(dataPesanan) {
           checkbox.dataset.orderGroup = group.key;
           checkbox.dataset.orderIds = JSON.stringify(group.rows.map(orderRow => orderRow.id));
           checkbox.setAttribute('aria-label', `Pilih pesanan ${group.noPesanan} untuk realisasi`);
+// Menyesuaikan data atau tampilan saat pilihan berubah.
           checkbox.addEventListener('change', updateBulkBar);
           checkboxCell.appendChild(checkbox);
         }
@@ -337,6 +358,8 @@ function renderTabelPesanan(dataPesanan) {
   updateBulkBar();
 }
 
+// 4. Akses database dan operasi pesanan.
+// Mengambil semua baris dari Supabase secara bertahap.
 async function ambilSemuaBaris(tabel, kolom, kolomUrut = 'id') {
   const semua = [];
   const ukuranHalaman = 1000;
@@ -351,6 +374,7 @@ async function ambilSemuaBaris(tabel, kolom, kolomUrut = 'id') {
   return { data: semua, error: null };
 }
 
+// Mengambil pesanan, produk, stok, dan alokasi untuk halaman ini.
 async function loadDataPesanan() {
   const statusEl = document.getElementById('status');
   statusEl.textContent = 'Memuat data pesanan...';
@@ -454,6 +478,7 @@ async function tambahPesanan(e) {
   await loadDataPesanan();
 }
 
+// Menyimpan perubahan status untuk semua pesanan yang dipilih.
 async function tandaiRealisasiTerpilih() {
   const checkedBoxes = document.querySelectorAll('.rowCheck:checked');
   if (checkedBoxes.length === 0) return;
@@ -475,6 +500,7 @@ async function tandaiRealisasiTerpilih() {
   await loadDataPesanan();
 }
 
+// Mengisi form dengan seluruh detail pada grup pesanan yang dipilih.
 async function mulaiEditPesanan(noPesanan) {
   const group = kelompokkanPesanan(listPesanan).find(item => item.key === normalisasiTeks(noPesanan));
   if (!group) return;
@@ -491,6 +517,7 @@ async function mulaiEditPesanan(noPesanan) {
   document.getElementById('formPesanan').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+// Menghapus state edit dan memulihkan form pesanan.
 function batalEditPesanan() {
   pesananSedangDiedit = null;
   document.getElementById('formPesanan').reset();
@@ -502,6 +529,7 @@ function batalEditPesanan() {
   tambahBarisProduk();
 }
 
+// Menghapus seluruh baris detail dengan nomor pesanan yang sama.
 async function hapusGrupPesanan(noPesanan) {
   if (!confirm(`Hapus pesanan ${noPesanan} beserta seluruh produk di dalamnya? Stok FIFO akan dihitung ulang.`)) return;
 
@@ -515,6 +543,8 @@ async function hapusGrupPesanan(noPesanan) {
   await loadDataPesanan();
 }
 
+// 5. Event UI dan inisialisasi halaman.
+// Menangani aksi pengguna pada tombol atau baris yang dipilih.
 document.getElementById('tabelPesanan').addEventListener('click', event => {
   const tombolEdit = event.target.closest('.btnEditPesanan');
   const tombolHapus = event.target.closest('.btnHapusGrupPesanan');
@@ -522,16 +552,26 @@ document.getElementById('tabelPesanan').addEventListener('click', event => {
   if (tombolHapus) hapusGrupPesanan(tombolHapus.dataset.orderNo);
 });
 
+// Memasang listener dan memuat data setelah dokumen siap.
 document.addEventListener('DOMContentLoaded', function () {
+// Memvalidasi lalu menyimpan data dari form.
   document.getElementById('formPesanan').addEventListener('submit', tambahPesanan);
+// Menyesuaikan data atau tampilan saat pilihan berubah.
   document.getElementById('inputTanggal').addEventListener('change', hitungEstimasiHppFIFO);
+// Menangani aksi pengguna pada tombol atau baris yang dipilih.
   document.getElementById('btnTambahProduk').addEventListener('click', tambahBarisProduk);
+// Menangani aksi pengguna pada tombol atau baris yang dipilih.
   document.getElementById('btnBatalEditPesanan').addEventListener('click', batalEditPesanan);
+// Menangani aksi pengguna pada tombol atau baris yang dipilih.
   document.getElementById('btnRealisasiTerpilih').addEventListener('click', tandaiRealisasiTerpilih);
+// Menangani perubahan nilai saat pengguna mengetik.
   document.getElementById('cariPesanan').addEventListener('input', () => renderTabelPesanan(listPesanan));
+// Menyesuaikan data atau tampilan saat pilihan berubah.
   document.getElementById('filterBulanPesanan').addEventListener('change', () => renderTabelPesanan(listPesanan));
+// Menyesuaikan data atau tampilan saat pilihan berubah.
   document.getElementById('filterStatusPesanan').addEventListener('change', () => renderTabelPesanan(listPesanan));
 
+// Menyesuaikan data atau tampilan saat pilihan berubah.
   document.getElementById('checkAll').addEventListener('change', function () {
     document.querySelectorAll('.rowCheck').forEach(cb => { cb.checked = this.checked; });
     updateBulkBar();

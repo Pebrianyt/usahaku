@@ -1,6 +1,8 @@
+// 1. Helper untuk memisahkan dan memformat nominal.
 // Input nominal Rupiah: tampil bertitik ribuan, menerima salinan berformat
 // Indonesia maupun format umum dengan koma sebagai pemisah ribuan.
 (function () {
+// Memisahkan nilai menjadi bagian bilangan, desimal, dan pemisah.
   function pecahNominal(value) {
     const teks = String(value ?? '').trim().replace(/[^0-9.,]/g, '');
     if (!teks) return { integer: '', fraction: '', decimal: false };
@@ -38,6 +40,7 @@
     return { integer, fraction, decimal: posisiDesimal >= 0, trailingDecimal: posisiDesimal >= 0 && teks.endsWith(pemisahDesimal) };
   }
 
+// Menampilkan nominal dengan pemisah ribuan tanpa mengubah nilainya.
   function formatNominal(value) {
     const bagian = pecahNominal(value);
     if (!bagian.integer && !bagian.decimal) return '';
@@ -46,6 +49,7 @@
     return integer + ',' + bagian.fraction;
   }
 
+// Membaca nilai nominal dari format lokal maupun format umum.
   function parseNominal(value) {
     const bagian = pecahNominal(value);
     if (!bagian.integer && !bagian.fraction) return 0;
@@ -53,6 +57,7 @@
     return Number(angka) || 0;
   }
 
+// Menjaga posisi kursor setelah nilai input diformat.
   function posisiSetelahDigit(teks, jumlahDigit) {
     if (jumlahDigit <= 0) return 0;
     let digitDitemukan = 0;
@@ -63,6 +68,8 @@
     return teks.length;
   }
 
+  // 2. Pemformatan input dan posisi kursor.
+  // Memformat nominal saat diketik sambil menjaga posisi kursor.
   function formatInput(input) {
     const awalCaret = input.selectionStart ?? input.value.length;
     const jumlahDigitSebelumCaret = (input.value.slice(0, awalCaret).match(/\d/g) || []).length;
@@ -73,11 +80,14 @@
     try { input.setSelectionRange(caretBaru, caretBaru); } catch (_) { /* tipe input tanpa caret */ }
   }
 
+  // 3. Event input dan fungsi publik untuk form.
+  // Menangani perubahan nilai saat pengguna mengetik.
   document.addEventListener('input', event => {
     const input = event.target;
     if (input instanceof HTMLInputElement && input.matches('[data-currency-input]')) formatInput(input);
   });
 
+  // Memfinalisasi format nilai saat input kehilangan fokus.
   document.addEventListener('blur', event => {
     const input = event.target;
     if (input instanceof HTMLInputElement && input.matches('[data-currency-input]')) {

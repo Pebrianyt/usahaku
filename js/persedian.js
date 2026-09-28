@@ -1,3 +1,4 @@
+// 1. Referensi elemen dan state persediaan.
 const statusEl = document.getElementById('status');
 const tabelEl = document.getElementById('tabelStok');
 const tabelTransaksiEl = document.getElementById('tabelTransaksiStok');
@@ -12,14 +13,18 @@ let daftarTransaksi = [];
 let daftarAlokasi = [];
 let transaksiSedangDiedit = null;
 
+// 2. Helper format, tanggal, dan pencetakan.
+// Memformat kode.
 function formatKode(id) {
   return 'P' + String(id).padStart(4, '0');
 }
 
+// Memformat rupiah.
 function formatRupiah(angka) {
   return 'Rp ' + Number(angka || 0).toLocaleString('id-ID', { maximumFractionDigits: 2 });
 }
 
+// Menghasilkan tanggal lokal dalam format YYYY-MM-DD.
 function tanggalLokal(date = new Date()) {
   const tahun = date.getFullYear();
   const bulan = String(date.getMonth() + 1).padStart(2, '0');
@@ -27,18 +32,22 @@ function tanggalLokal(date = new Date()) {
   return `${tahun}-${bulan}-${hari}`;
 }
 
+// Mengamankan teks sebelum dimasukkan ke markup HTML.
 function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, karakter => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   })[karakter]);
 }
 
+// Memformat tanggal indonesia.
 function formatTanggalIndonesia(tanggal) {
   return new Date(`${tanggal}T00:00:00`).toLocaleDateString('id-ID', {
     day: 'numeric', month: 'long', year: 'numeric'
   });
 }
 
+// 3. Perhitungan dan render persediaan.
+// Menghitung stok sampai.
 function hitungStokSampai(tanggalBatas) {
   const stok = new Map(daftarProduk.map(produk => [String(produk.id), 0]));
   daftarTransaksi.filter(item => item.tanggal <= tanggalBatas).forEach(item => {
@@ -49,6 +58,7 @@ function hitungStokSampai(tanggalBatas) {
   return stok;
 }
 
+// Menyiapkan dan mencetak form opname.
 function cetakFormOpname(judul, keteranganPeriode, produkUntukDicetak) {
   const areaCetak = document.getElementById('areaCetakStokOpname');
   const hariIni = tanggalLokal();
@@ -75,6 +85,7 @@ function cetakFormOpname(judul, keteranganPeriode, produkUntukDicetak) {
   window.setTimeout(() => window.print(), 100);
 }
 
+// Menyiapkan dan mencetak stok semua produk.
 function cetakStokSemuaProduk() {
   const stokSekarang = hitungStokSampai(tanggalLokal());
   const semuaProduk = daftarProduk.map(produk => ({
@@ -87,6 +98,7 @@ function cetakStokSemuaProduk() {
   );
 }
 
+// Menyiapkan dan mencetak opname mingguan.
 function cetakOpnameMingguan() {
   const akhir = tanggalLokal();
   const tanggalMulai = new Date();
@@ -106,12 +118,14 @@ function cetakOpnameMingguan() {
   );
 }
 
+// Membuat sel tabel dan memasukkan nilai teks dengan aman.
 function tambahSel(row, value) {
   const td = document.createElement('td');
   td.textContent = value ?? '-';
   row.appendChild(td);
 }
 
+// Mengisi dropdown produk.
 function isiDropdownProduk() {
   selectProdukEl.innerHTML = '<option value="">-- pilih produk --</option>';
   daftarProduk.filter(produk => produk.aktif !== false).forEach(produk => {
@@ -123,6 +137,7 @@ function isiDropdownProduk() {
   });
 }
 
+// Menampilkan HPP terbaru untuk produk yang dipilih.
 function tampilkanHppProduk() {
   const option = selectProdukEl.options[selectProdukEl.selectedIndex];
   document.getElementById('inputHppStok').value = option?.value
@@ -130,12 +145,14 @@ function tampilkanHppProduk() {
     : '';
 }
 
+// Membentuk tanggal awal dan akhir dari bulan yang dipilih.
 function tanggalBulan(bulan) {
   const [tahun, nomorBulan] = bulan.split('-').map(Number);
   const akhir = new Date(tahun, nomorBulan, 0).getDate();
   return { awal: `${bulan}-01`, akhir: `${bulan}-${String(akhir).padStart(2, '0')}` };
 }
 
+// Menghubungkan transaksi stok keluar dengan lapisan stok masuk.
 function buatPetaAlokasi() {
   const transaksiMap = new Map(daftarTransaksi.map(item => [String(item.id), item]));
   const perMasuk = new Map();
@@ -156,6 +173,7 @@ function buatPetaAlokasi() {
   return { transaksiMap, perMasuk, perKeluar };
 }
 
+// Merender rekap bulan.
 function renderRekapBulan() {
   const bulan = filterBulanEl.value;
   if (!bulan) return;
@@ -235,6 +253,7 @@ function renderRekapBulan() {
   tampilkanTransaksiBulan(daftarTransaksi, perKeluar);
 }
 
+// Merender stok saat ini.
 function renderStokSaatIni(perMasuk) {
   const hariIni = tanggalLokal();
   tabelStokSaatIniEl.replaceChildren();
@@ -272,6 +291,7 @@ function renderStokSaatIni(perMasuk) {
   }
 }
 
+// Menampilkan transaksi bulan.
 function tampilkanTransaksiBulan(transaksiBulan, perKeluar) {
   const produkMap = new Map(daftarProduk.map(produk => [String(produk.id), produk]));
   const cari = document.getElementById('cariTransaksiStok').value.trim().toLocaleLowerCase('id-ID');
@@ -337,6 +357,8 @@ function tampilkanTransaksiBulan(transaksiBulan, perKeluar) {
   }
 }
 
+// 4. Akses database, filter, dan aksi transaksi.
+// Mengambil seluruh transaksi persediaan dari Supabase secara bertahap.
 async function ambilSemuaTransaksi(tabel, kolom) {
   const semua = [];
   const ukuranHalaman = 1000;
@@ -350,6 +372,7 @@ async function ambilSemuaTransaksi(tabel, kolom) {
   return { data: semua, error: null };
 }
 
+// Mengambil data produk, stok, dan alokasi untuk membangun halaman.
 async function muatDataStok() {
   statusEl.textContent = 'Memuat data stok...';
   const [hasilProduk, hasilTransaksi, hasilAlokasi] = await Promise.all([
@@ -381,10 +404,16 @@ async function muatDataStok() {
     (keluarBelumPenuh ? ' Ada barang keluar lama yang nilai modalnya belum tercatat lengkap. Periksa saldo awal stok.' : '');
 }
 
+// Menyesuaikan data atau tampilan saat pilihan berubah.
 selectProdukEl.addEventListener('change', tampilkanHppProduk);
+// Menyesuaikan data atau tampilan saat pilihan berubah.
 filterBulanEl.addEventListener('change', renderRekapBulan);
+// Menangani aksi pengguna pada tombol atau baris yang dipilih.
 document.getElementById('btnCetakStokSaatIni').addEventListener('click', cetakStokSemuaProduk);
+// Menangani aksi pengguna pada tombol atau baris yang dipilih.
 document.getElementById('btnCetakOpnameMingguan').addEventListener('click', cetakOpnameMingguan);
+// 5. Event UI dan inisialisasi halaman.
+// Memulihkan tampilan setelah proses cetak selesai.
 window.addEventListener('afterprint', () => {
   document.body.classList.remove('printMode');
   const areaCetak = document.getElementById('areaCetakStokOpname');
@@ -392,9 +421,11 @@ window.addEventListener('afterprint', () => {
 });
 ['cariTransaksiStok', 'filterJenisTransaksi', 'filterTanggalMulai', 'filterTanggalAkhir'].forEach(id => {
   const el = document.getElementById(id);
+// Menangani event antarmuka untuk menjaga alur halaman.
   el.addEventListener(id === 'cariTransaksiStok' ? 'input' : 'change', () => renderRekapBulan());
 });
 
+// Menghapus state edit dan memulihkan form stok.
 function batalEditStok() {
   transaksiSedangDiedit = null;
   formEl.reset();
@@ -409,7 +440,9 @@ function batalEditStok() {
   tombolSubmit.setAttribute('aria-label', 'Simpan stok');
 }
 
+// Menangani aksi pengguna pada tombol atau baris yang dipilih.
 tombolBatalEditEl.addEventListener('click', batalEditStok);
+// Menangani aksi pengguna pada tombol atau baris yang dipilih.
 tabelTransaksiEl.addEventListener('click', async event => {
   const tombol = event.target.closest('button[data-aksi]');
   if (!tombol) return;
@@ -453,6 +486,7 @@ tabelTransaksiEl.addEventListener('click', async event => {
   await muatDataStok();
 });
 
+// Memvalidasi lalu menyimpan data dari form.
 formEl.addEventListener('submit', async e => {
   e.preventDefault();
   const kodeProduk = Number(selectProdukEl.value);

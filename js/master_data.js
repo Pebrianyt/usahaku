@@ -1,3 +1,4 @@
+// 1. Referensi elemen dan state produk.
 const statusEl = document.getElementById('status');
 const tabelEl = document.getElementById('tabelProduk');
 const formEl = document.getElementById('formTambah');
@@ -5,28 +6,35 @@ const formEl = document.getElementById('formTambah');
 let produkData = [];
 let editingId = null;
 
+// 2. Helper format dan validasi produk.
+// Memformat rupiah.
 function formatRupiah(angka) {
   return 'Rp ' + Number(angka).toLocaleString('id-ID', { maximumFractionDigits: 2 });
 }
 
+// Membentuk kode produk yang ditampilkan dari ID database.
 function formatKode(id) {
   return 'P' + String(id).padStart(4, '0');
 }
 
+// Memformat angka input.
 function formatAngkaInput(value) {
   return window.UsahaKuCurrency.format(value);
 }
 
+// Mengurai rupiah input.
 function parseRupiahInput(str) {
   return window.UsahaKuCurrency.parse(str);
 }
 
+// Mencari produk duplikat.
 function namaProdukDuplikat(nama, kecualiId = null) {
   const namaNormal = nama.trim().toLocaleLowerCase('id-ID');
   return produkData.some(row => String(row.id) !== String(kecualiId) &&
     String(row.nama_produk || '').trim().toLocaleLowerCase('id-ID') === namaNormal);
 }
 
+// Menyusun pesan validasi produk.
 function pesanValidasiProduk(nama, hpp, kecualiId = null) {
   if (!nama) return 'Nama produk wajib diisi.';
   if (!Number.isFinite(hpp) || hpp < 0) return 'HPP harus berupa angka nol atau lebih.';
@@ -34,6 +42,7 @@ function pesanValidasiProduk(nama, hpp, kecualiId = null) {
   return '';
 }
 
+// Mengubah error database menjadi pesan produk yang mudah dipahami.
 function tampilkanErrorProduk(error, aksi) {
   if (error.code === '23505') {
     alert('Nama produk tersebut sudah terdaftar. Gunakan nama yang berbeda.');
@@ -43,6 +52,7 @@ function tampilkanErrorProduk(error, aksi) {
 }
 
 const inputHppEl = document.getElementById('inputHpp');
+// Mencegah nilai HPP kurang dari nol dimasukkan.
 function tolakHppNegatif(event) {
   const input = event.target.closest?.('#inputHpp, .editHpp');
   if (!input) return;
@@ -57,13 +67,19 @@ function tolakHppNegatif(event) {
   }
 }
 
+// Menangani event antarmuka untuk menjaga alur halaman.
 document.addEventListener('beforeinput', tolakHppNegatif);
+// Menangani event antarmuka untuk menjaga alur halaman.
 document.addEventListener('paste', tolakHppNegatif);
+// Menangani event antarmuka untuk menjaga alur halaman.
 document.addEventListener('keydown', tolakHppNegatif);
+// Menangani perubahan nilai saat pengguna mengetik.
 inputHppEl.addEventListener('input', (e) => {
   e.target.value = formatAngkaInput(e.target.value);
 });
 
+// 3. Memuat dan merender data produk.
+// Mengambil daftar produk dari Supabase lalu memperbarui status halaman.
 async function muatProduk() {
   statusEl.textContent = 'Memuat data...';
 
@@ -84,6 +100,7 @@ async function muatProduk() {
   renderTabel();
 }
 
+// Membuat ulang tabel produk beserta tombol aksinya.
 function renderTabel() {
   tabelEl.innerHTML = '';
 
@@ -132,6 +149,8 @@ function renderTabel() {
   });
 }
 
+// 4. Event form, tabel, dan pencarian.
+// Memvalidasi lalu menyimpan data dari form.
 formEl.addEventListener('submit', async (e) => {
   e.preventDefault();
 
@@ -158,13 +177,14 @@ formEl.addEventListener('submit', async (e) => {
   muatProduk();
 });
 
-// Format live saat mengetik HPP di baris yang sedang diedit
+// Memformat input HPP langsung saat pengguna mengetik di baris edit.
 tabelEl.addEventListener('input', (e) => {
   if (e.target.classList.contains('editHpp')) {
     e.target.value = formatAngkaInput(e.target.value);
   }
 });
 
+// Menangani aksi pengguna pada tombol atau baris yang dipilih.
 tabelEl.addEventListener('click', async (e) => {
   const btn = e.target.closest('button');
   if (!btn) return;
@@ -260,6 +280,7 @@ muatProduk();
 const searchInput = document.getElementById('searchInput');
 
 if (searchInput) {
+// Menangani perubahan nilai saat pengguna mengetik.
   searchInput.addEventListener('input', function (e) {
     const keyword = e.target.value.toLowerCase().trim();
     const rows = document.querySelectorAll('table tbody tr');

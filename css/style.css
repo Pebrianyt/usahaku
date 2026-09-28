@@ -1,3 +1,4 @@
+/* Token warna dan fondasi tampilan bersama untuk semua halaman HTML. */
 :root{
   --bg:#F7F5F1; --panel:#FFFFFF; --ink:#1B2430; --sub:#6B7480;
   --line:#E7E3DB; --brand:#9bbe92; --brand-ink:#EAF3EF;
@@ -10,11 +11,14 @@ body{
   display:flex; min-height:100vh;
 }
 
+/* Navigasi bersama yang dipakai dashboard.html dan seluruh halaman fitur. */
 nav.topnav{
   width:220px; flex-shrink:0; background:var(--panel); border-right:1px solid var(--line);
   padding:24px 16px; display:flex; flex-direction:column; gap:4px;
   position:fixed; top:0; left:0; bottom:0; overflow-y:auto;
 }
+nav.topnav .navMenu{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;}
+nav.topnav .navMenu li{margin:0;padding:0;}
 nav.topnav .brand{display:flex; align-items:center; gap:10px; padding:4px 8px 22px;}
 nav.topnav .brand .mark{width:32px; height:32px; border-radius:9px; background:var(--brand); color:var(--brand-ink); display:flex; align-items:center; justify-content:center; font-weight:700;}
 nav.topnav .brand .name{font-weight:700; font-size:17px;}
@@ -25,6 +29,7 @@ nav.topnav a{
 nav.topnav a.active{background:var(--brand-ink); color:var(--brand);}
 nav.topnav a:not(.active):hover{background:var(--line);}
 
+/* Tata letak landmark konten utama pada seluruh halaman fitur. */
 main{flex:0 1 auto; width:calc(100% - 220px); min-width:0; margin-left:220px; padding:28px 32px 60px; max-width:1080px;}
 header.pagehead{margin-bottom:22px;}
 header.pagehead h1{font-size:22px; margin:0 0 4px;}
@@ -36,6 +41,7 @@ header.pagehead p{margin:0; color:var(--sub); font-size:14px;}
 .card .label{font-size:12.5px; color:var(--sub); margin-bottom:6px;}
 .card .value{font-size:21px; font-weight:700;}
 
+/* Gaya bersama untuk form, input, tombol, dan tabel pada halaman fitur. */
 form{
   background:var(--panel); border:1px solid var(--line); border-radius:var(--r);
   padding:16px; display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; align-items:center;
@@ -92,9 +98,13 @@ td .inputRupiah .prefix{left:8px;}
 
 @media (max-width:760px){
   body{flex-direction:column;}
+  /* Navigasi horizontal pada layar kecil. */
   nav.topnav{position:static; width:100%; flex-direction:row; overflow-x:auto; padding:12px;}
   nav.topnav .brand{display:none;}
+  nav.topnav .navMenu{flex-direction:row;width:max-content;}
+  /* Kurangi jarak konten utama pada layar kecil. */
   main{margin-left:0; padding:20px 16px;}
+  /* Susun bidang form secara vertikal pada layar kecil. */
   form{flex-direction:column; align-items:stretch;}
 }
 
@@ -126,6 +136,7 @@ button[type="submit"].btnIcon.btnTambah::after{width:3px; height:16px;}
 .btnIcon.btnEdit{color:#1B2430;}
 .btnIcon.btnHapus{color:#1B2430;}
 
+/* Khusus daftar_pesanan.html: pilihan massal dan tabel pesanan. */
 .bulkbar{display:flex; align-items:center; gap:10px; margin-bottom:12px;}
 .bulkbar span{font-size:12.5px; color:var(--sub);}
 .bulkbar .bulkSelectAll{display:inline-flex;align-items:center;gap:7px;color:var(--sub);font-size:12.5px;cursor:pointer;}
@@ -205,8 +216,13 @@ button[type="submit"].btnIcon:hover{
   .produkPesananRow .fieldGroup:first-child{grid-column:1/-1;}
   .pesananFormActions{flex-direction:column;align-items:stretch;}
 }
-/* Label tersembunyi secara visual, tetap terbaca oleh pembaca layar */.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
-.searchProduk{margin-bottom:12px;}.searchProduk label{display:block;margin-bottom:6px;color:var(--sub);font-size:13px;}.searchProduk input{width:100%;padding:10px 14px;border-radius:10px;border:1px solid #e2e8f0;font-size:14px;background-color:#fff;outline:none;}
+/* Label tersembunyi secara visual, tetap terbaca oleh pembaca layar */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+/* Khusus master_data.html: pencarian produk. */
+.searchProduk{margin-bottom:12px;}
+.searchProduk label{display:block;margin-bottom:6px;color:var(--sub);font-size:13px;}
+.searchProduk input{width:100%;padding:10px 14px;border-radius:10px;border:1px solid #e2e8f0;font-size:14px;background-color:#fff;outline:none;}
+/* Khusus persediaan.html: opname, rekap stok, dan transaksi persediaan. */
 .stokRekap{margin:24px 0;}
 .stokRekapHeader{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;}
 .stokRekapHeader h2{margin:0 12px 4px 0;font-size:18px;}
@@ -225,6 +241,7 @@ button[type="submit"].btnIcon:hover{
 main>h2{margin:24px 0 10px;font-size:18px;}
 .tableScroll{width:100%;overflow-x:auto;margin-bottom:22px;}
 .tableScroll table{min-width:850px;}
+/* Filter periode dipakai laba_rugi.html dan dashboard.html. */
 .reportFilter{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin:0 0 12px;color:var(--sub);font-size:13px;}
 .reportFilter input{flex:0 0 180px;min-width:150px;}
 .btnDownload{padding:9px 14px;border:1px solid #D8D4CB;background:#FFFFFF;color:#1B2430;border-radius:8px;cursor:pointer;font-weight:600;font-size:13.5px;box-shadow:0 1px 2px rgba(0,0,0,0.08);}
@@ -234,6 +251,7 @@ main>h2{margin:24px 0 10px;font-size:18px;}
 .kasPeriodFilter input{flex:0 0 180px;min-width:150px;}
 .reportNote{color:var(--sub);font-size:12.5px;margin-top:0;}
 .dashboardFilter{margin-top:-8px;}
+/* Khusus dashboard.html: kartu grafik dan visualisasi ringkasan. */
 .dashboardCharts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
 .chartCard{min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:2px;}
 .chartCard h2{font-size:17px;margin:0 0 4px;}
@@ -250,10 +268,12 @@ main>h2{margin:24px 0 10px;font-size:18px;}
 .chartLegend span{display:inline-flex;align-items:center;gap:6px;color:var(--sub);font-size:12px;}
 .chartLegend i{display:inline-block;width:10px;height:10px;border-radius:3px;}
 .chartEmpty{color:var(--sub);padding:18px 4px;}
+/* Khusus master_data.html: badge dan tombol status produk. */
 .statusProduk{display:inline-block;padding:4px 10px;border:1px solid #D8D4CB;border-radius:999px;background:#fff;color:#1B2430;font-size:12px;font-weight:600;}
 .statusProduk.nonaktif{background:#F0EEE9;color:#6B7280;}
 .btnStatusProduk{margin:0 6px;padding:8px 10px;border:1px solid #D8D4CB;border-radius:9px;background:#fff;color:#1B2430;font:inherit;font-size:12px;font-weight:600;cursor:pointer;}
 .btnStatusProduk:hover{background:#F0EEE9;}
+/* Khusus daftar_pesanan.html: filter serta ringkasan grup pesanan. */
 .pesananFilters{display:grid;grid-template-columns:minmax(220px,2fr) minmax(170px,1fr) minmax(170px,1fr);gap:12px;margin:0 0 14px;}
 .pesananFilters .fieldGroup{margin:0;}
 .pesananFilters label{display:block;margin-bottom:6px;color:var(--sub);font-size:13px;}
@@ -262,8 +282,8 @@ main>h2{margin:24px 0 10px;font-size:18px;}
 .pesananDetailRow td{vertical-align:middle;}
 .pesananDetailRow td:nth-child(4),.pesananDetailRow td:first-child{color:var(--ink);}
 .pesananFilters input,.pesananFilters select{width:100%;}
-#formKas{margin-bottom:22px;}
-#formKas{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:start;}
+/* Khusus arus_kas.html: form transaksi dan petunjuk kategori. */
+#formKas{margin-bottom:22px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:start;}
 #formKas h2{grid-column:1/-1;margin:0 0 2px;font-size:18px;}
 #formKas .fieldGroup{min-width:0;}
 #formKas .fieldGroup>input,#formKas .fieldGroup>select,#formKas .inputRupiah{min-width:0;width:100%;}
@@ -273,10 +293,13 @@ main>h2{margin:24px 0 10px;font-size:18px;}
 .kasFieldHint{min-height:14px;color:var(--sub);font-size:11px;line-height:1.25;}
 #formStok .hppBox{flex:0 0 140px;}
 @media(max-width:760px){
+  /* Konten utama memenuhi lebar layar kecil. */
   main{flex:0 1 auto;width:100%;max-width:none;}
   .stokTransaksiFilters{grid-template-columns:1fr 1fr;}
+  /* Filter pesanan ditumpuk pada layar kecil. */
   .pesananFilters{grid-template-columns:1fr;}
   .tblPesanan{min-width:940px;}
+  /* Grafik dashboard ditampilkan satu kolom pada layar kecil. */
   .dashboardCharts{grid-template-columns:1fr;}
   .chartCard{padding:14px;}
   .dashboardChart{min-height:170px;}
@@ -284,12 +307,14 @@ main>h2{margin:24px 0 10px;font-size:18px;}
   .stokRekapHeader input{flex:1;}
   .kasPeriodFilter{justify-content:flex-start;}
   .kasPeriodFilter input{flex:1;}
+  /* Form kas memakai dua kolom pada layar kecil. */
   #formKas{grid-template-columns:repeat(2,minmax(0,1fr));}
   #formKas .kasRincianKas{grid-column:1/-1;}
   .kasFormActions{grid-column:1/-1;justify-content:flex-start;}
 }
 
 @media(max-width:480px){
+  /* Form kas menjadi satu kolom pada layar sangat kecil. */
   #formKas{grid-template-columns:1fr;}
   #formKas .kasRincianKas,.kasFormActions{grid-column:1;}
 }
@@ -306,4 +331,14 @@ main>h2{margin:24px 0 10px;font-size:18px;}
   #areaCetakStokOpname td:nth-child(1),#areaCetakStokOpname td:nth-child(4),#areaCetakStokOpname td:nth-child(6){text-align:center;}
   #areaCetakStokOpname .kolomIsi{height:27px;}
 }
+
+
+/* Ikon SVG pada navigasi bersama seluruh halaman HTML. */
+nav.topnav a{gap:12px;}
+nav.topnav a .navIcon{width:20px;height:20px;flex:0 0 20px;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+nav.topnav a span{line-height:1.3;}
+
+
+/* Gaya judul metrik semantik yang memakai elemen h2 di dalam kartu. */
+.card .label{margin:0 0 6px;font-size:12.5px;font-weight:600;}
 
