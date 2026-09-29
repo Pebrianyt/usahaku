@@ -99,13 +99,21 @@ td .inputRupiah .prefix{left:8px;}
 @media (max-width:760px){
   body{flex-direction:column;}
   /* Navigasi horizontal pada layar kecil. */
-  nav.topnav{position:static; width:100%; flex-direction:row; overflow-x:auto; padding:12px;}
+  nav.topnav{position:sticky; top:0; z-index:10; width:100%; flex-direction:row; overflow-x:auto; padding:8px 12px; border-right:0; border-bottom:1px solid var(--line);}
   nav.topnav .brand{display:none;}
-  nav.topnav .navMenu{flex-direction:row;width:max-content;}
+  nav.topnav .navMenu{flex-direction:row;width:max-content; flex:0 0 auto;}
+  nav.topnav a{white-space:nowrap;}
   /* Kurangi jarak konten utama pada layar kecil. */
-  main{margin-left:0; padding:20px 16px;}
+  main{margin-left:0; width:100%; max-width:none; padding:20px 16px 40px;}
   /* Susun bidang form secara vertikal pada layar kecil. */
-  form{flex-direction:column; align-items:stretch;}
+  form{flex-direction:column; align-items:stretch; gap:12px;}
+  form .fieldGroup{flex:0 0 auto; width:100%; min-width:0;}
+  form .fieldGroup>input,
+  form .fieldGroup>select,
+  form .fieldGroup .inputRupiah{flex:0 0 auto; min-height:40px;}
+  form .fieldGroup .inputRupiah input{flex:0 0 auto;}
+  form button[type="submit"]{align-self:flex-start;}
+  table{display:block; max-width:100%; overflow-x:auto;}
 }
 
 /* tombol berbentuk ikon bulat/kotak, tanpa teks — monokrom hitam putih */
