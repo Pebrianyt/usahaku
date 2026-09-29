@@ -110,10 +110,10 @@ td .inputRupiah .prefix{left:8px;}
   form .fieldGroup{flex:0 0 auto; width:100%; min-width:0;}
   form .fieldGroup>input,
   form .fieldGroup>select,
-  form .fieldGroup .inputRupiah{flex:0 0 auto; min-height:40px;}
-  form .fieldGroup .inputRupiah input{flex:0 0 auto;}
+  form .fieldGroup .inputRupiah{flex:0 0 42px; height:42px; min-height:42px;}
+  form .fieldGroup .inputRupiah input{flex:0 0 42px; height:42px;}
   form button[type="submit"]{align-self:flex-start;}
-  table{display:block; max-width:100%; overflow-x:auto;}
+  table{display:block; width:100%; min-width:640px; max-width:100%; overflow-x:auto;}
 }
 
 /* tombol berbentuk ikon bulat/kotak, tanpa teks — monokrom hitam putih */
