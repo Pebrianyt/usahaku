@@ -1,0 +1,6 @@
+{
+  "name": "UsahaKu",
+  "description": "Aplikasi manajemen usaha: pantau pesanan, omzet, laba, persediaan, dan arus kas.",
+  "permissions": [],
+  "capabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
