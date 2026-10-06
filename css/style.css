@@ -99,10 +99,10 @@ td .inputRupiah .prefix{left:8px;}
 @media (max-width:760px){
   body{flex-direction:column;}
   /* Navigasi horizontal pada layar kecil. */
-  nav.topnav{position:sticky; top:0; z-index:10; width:100%; flex-direction:row; overflow-x:auto; padding:8px 12px; border-right:0; border-bottom:1px solid var(--line);}
+  /* nav.topnav{position:sticky; top:0; z-index:10; width:100%; flex-direction:row; overflow-x:auto; padding:8px 12px; border-right:0; border-bottom:1px solid var(--line);}
   nav.topnav .brand{display:none;}
   nav.topnav .navMenu{flex-direction:row;width:max-content; flex:0 0 auto;}
-  nav.topnav a{white-space:nowrap;}
+  nav.topnav a{white-space:nowrap;} */
   /* Kurangi jarak konten utama pada layar kecil. */
   main{margin-left:0; width:100%; max-width:none; padding:20px 16px 40px;}
   /* Susun bidang form secara vertikal pada layar kecil. */
@@ -147,6 +147,7 @@ button[type="submit"].btnIcon.btnTambah::after{width:3px; height:16px;}
 /* Khusus daftar_pesanan.html: pilihan massal dan tabel pesanan. */
 .bulkbar{display:flex; align-items:center; gap:10px; margin-bottom:12px;}
 .bulkbar span{font-size:12.5px; color:var(--sub);}
+.bulkbar .badge.bg-secondary{color:#000;}
 .bulkbar .bulkSelectAll{display:inline-flex;align-items:center;gap:7px;color:var(--sub);font-size:12.5px;cursor:pointer;}
 .bulkbar .bulkSelectAll input{margin:0;}
 input[type="checkbox"]{width:16px; height:16px; cursor:pointer;}
@@ -190,8 +191,8 @@ button[type="submit"].btnIcon:hover{
   display:inline-block; padding:3px 9px; border-radius:100px;
   font-size:11.5px; font-weight:600;
 }
-.badge.bg-success{ background:#E4F3E9; color:#1F7A43; }
-.badge.bg-warning{ background:#FCEFDD; color:#B4700F; }
+/* .badge.bg-success{ background:#E4F3E9; color:#1F7A43; }
+.badge.bg-warning{ background:#FCEFDD; color:#B4700F; } */
 
 .tblPesanan th.thPilihRealisasi{
   width:4%;
@@ -199,7 +200,7 @@ button[type="submit"].btnIcon:hover{
   padding-left:3px;
   padding-right:3px;
 }
-.tblPesanan .rowCheck{display:block;margin:0 auto;}
+.tblPesanan .rowCheck{display:block;width:16px!important;min-width:16px;max-width:16px;height:16px;margin:0 auto;flex:0 0 16px;}
 .tblPesanan td.pesananCheckboxCell{position:sticky;left:0;z-index:2;width:38px;padding-left:3px;padding-right:3px;text-align:center;background:var(--panel);}
 .tblPesanan .pesananOrderCell{vertical-align:middle;}
 .tblPesanan .pesananGroupStart td{border-top:1px solid var(--line);}
@@ -209,6 +210,17 @@ button[type="submit"].btnIcon:hover{
 .pesananUtama .fieldGroup{min-width:0;}
 .produkPesananList{display:flex;flex-direction:column;gap:10px;width:100%;}
 .produkPesananRow{grid-template-columns:minmax(180px,2fr) minmax(100px,.8fr) minmax(90px,.7fr) minmax(120px,1fr) auto;width:100%;}
+#produkPesananList .produkPesananHeader{display:flex;gap:8px;align-items:end;width:100%;padding:0 8px 2px;color:var(--sub);font-size:.9rem;font-weight:600;}
+#produkPesananList .produkPesananHeader span{min-width:0;white-space:nowrap;}
+#produkPesananList .produkPesananHeader span:first-child{flex:1 1 auto;}
+#produkPesananList .produkPesananHeader span:nth-child(2){flex:0 0 100px;}
+#produkPesananList .produkPesananHeader span:nth-child(3){flex:0 0 280px;}
+#produkPesananList .produkPesananHeader span:nth-child(4){flex:0 0 150px;}
+#produkPesananList .produkPesananHeader span:nth-child(5){flex:0 0 34px;}
+.hppProdukGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:6px;width:100%;min-height:38px;align-items:stretch;}
+.hppProdukLayer{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;padding:3px 5px;border:1px solid #e2e8f0;border-radius:6px;background:#fff;color:var(--sub);font-size:13px;line-height:1.2;}
+.hppProdukLayer small{font-size:11px;color:var(--sub);}
+.hppProdukKosong{display:flex;align-items:center;min-height:38px;padding:0 10px;border:1px solid #e2e8f0;border-radius:6px;background:#fff;color:var(--sub);}
 .produkPesananRow input,.produkPesananRow select{width:100%;min-width:0;}
 .produkPesananRow .fieldGroup{min-width:0;}
 .pesananFormActions{display:flex;align-items:center;gap:10px;width:100%;}
@@ -221,6 +233,7 @@ button[type="submit"].btnIcon:hover{
   .fieldGroup{width:100%;min-width:0;}
   .pesananUtama{grid-template-columns:1fr;}
   .produkPesananRow{grid-template-columns:1fr 1fr;}
+  #produkPesananList .produkPesananHeader{display:none;}
   .produkPesananRow .fieldGroup:first-child{grid-column:1/-1;}
   .pesananFormActions{flex-direction:column;align-items:stretch;}
 }
@@ -246,9 +259,128 @@ button[type="submit"].btnIcon:hover{
 .stokOpnameTools p{margin:0;color:var(--sub);font-size:13px;}
 .printOnly{display:none;}
 #formStok h2{flex:0 0 100%;margin:0 0 2px;font-size:18px;}
+#formStok {
+  display: grid;
+  grid-template-columns: 1fr 1.8fr 1.2fr 0.8fr;
+  gap: 14px;
+  align-items: start;
+}
+
+/* Judul */
+#formStok #judulFormStok {
+  grid-column: 1 / -1;
+  margin-bottom: 0 !important;
+}
+
+/* Field */
+#formStok .fieldGroup {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+#formStok .fieldGroup > input,
+#formStok .fieldGroup > select {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Harga perolehan */
+#formStok .hppField {
+  grid-column: 1 / 3;
+}
+
+#formStok .inputRupiah {
+  width: 100%;
+  min-width: 0;
+}
+
+#formStok .inputRupiah input {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Checkbox */
+#formStok .hppCheck {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin-top: 7px;
+}
+
+#formStok .hppCheck input[type="checkbox"] {
+  flex: 0 0 auto;
+  width: 16px;
+  min-width: 16px;
+  height: 16px;
+  margin: 1px 0 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+#formStok .hppCheck label {
+  margin: 0;
+  color: var(--sub);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.35;
+  cursor: pointer;
+}
+
+/* Keterangan */
+#formStok .hppHelp {
+  display: block;
+  margin-top: 3px;
+  color: var(--sub);
+  font-size: 11.5px;
+  line-height: 1.35;
+}
+
+/* Tombol */
+#formStok > button[type="submit"] {
+  align-self: end;
+  height: 38px;
+  margin: 0;
+}
+
+#formStok > #btnBatalEditStok {
+  align-self: end;
+  height: 38px;
+  margin: 0 !important;
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+  #formStok {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  #formStok .hppField {
+    grid-column: 1 / -1;
+  }
+}
+
+/* HP */
+@media (max-width: 600px) {
+  #formStok {
+    grid-template-columns: 1fr;
+  }
+
+  #formStok .hppField {
+    grid-column: auto;
+  }
+
+  #formStok > button[type="submit"],
+  #formStok > #btnBatalEditStok {
+    width: 100%;
+  }
+}
 main>h2{margin:24px 0 10px;font-size:18px;}
 .tableScroll{width:100%;overflow-x:auto;margin-bottom:22px;}
 .tableScroll table{min-width:850px;}
+.stokRiwayatTable th:first-child,.stokRiwayatTable td:first-child{min-width:115px;white-space:nowrap;}
 /* Filter periode dipakai laba_rugi.html dan index.html. */
 .reportFilter{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin:0 0 12px;color:var(--sub);font-size:13px;}
 .reportFilter input{flex:0 0 180px;min-width:150px;}
@@ -299,7 +431,6 @@ main>h2{margin:24px 0 10px;font-size:18px;}
 .kasFormActions{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0;align-self:end;}
 .kasFormActions .btnTambahProduk{white-space:nowrap;}
 .kasFieldHint{min-height:14px;color:var(--sub);font-size:11px;line-height:1.25;}
-#formStok .hppBox{flex:0 0 140px;}
 @media(max-width:760px){
   /* Konten utama memenuhi lebar layar kecil. */
   main{flex:0 1 auto;width:100%;max-width:none;}
@@ -328,15 +459,16 @@ main>h2{margin:24px 0 10px;font-size:18px;}
 }
 
 @media print{
-  @page{size:A4 landscape;margin:12mm;}
+  @page{size:A4 portrait;margin:12mm;}
   body.printMode>*:not(#areaCetakStokOpname){display:none!important;}
-  body.printMode #areaCetakStokOpname{display:block!important;color:#111;font:10pt Arial,sans-serif;}
+  body.printMode>#areaCetakStokOpname{display:block!important;width:auto;background:#fff;color:#111;font:10pt Arial,sans-serif;}
   #areaCetakStokOpname h1{margin:0 0 5px;font-size:18pt;}
+  #areaCetakStokOpname h2{margin:0 0 5px;font-size:18pt;}
   #areaCetakStokOpname p{margin:3px 0 12px;font-size:9pt;}
-  #areaCetakStokOpname table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #555;}
+  #areaCetakStokOpname table{display:inline-table;width:fit-content!important;max-width:100%;border-collapse:collapse;background:#fff;border:1px solid #555;border-radius:0;overflow:visible;}
   #areaCetakStokOpname th,#areaCetakStokOpname td{padding:6px 7px;border:1px solid #777;color:#111;font-size:9pt;text-align:left;}
   #areaCetakStokOpname th{background:#e8e8e8;font-weight:700;}
-  #areaCetakStokOpname td:nth-child(1),#areaCetakStokOpname td:nth-child(4),#areaCetakStokOpname td:nth-child(6){text-align:center;}
+  #areaCetakStokOpname td:nth-child(1),#areaCetakStokOpname td:nth-child(3),#areaCetakStokOpname td:nth-child(4){text-align:center;}
   #areaCetakStokOpname .kolomIsi{height:27px;}
 }
 

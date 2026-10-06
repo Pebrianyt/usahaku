@@ -1,71 +1,76 @@
-# UsahaKu
+# UsahaKu (Vue 3 + Bootstrap + Supabase)
 
-UsahaKu adalah aplikasi web sederhana untuk membantu mengelola data usaha, mulai dari produk dan harga, persediaan, pesanan, hingga ringkasan keuangan. Aplikasi dibuat dengan HTML, CSS, dan JavaScript, serta menggunakan Supabase untuk menyimpan data.
+UsahaKu adalah aplikasi web manajemen usaha terpadu untuk memantau pesanan, inventori/stok FIFO, laba rugi, dan arus kas. Proyek ini dibangun dengan **Vue 3 Options API**, **Vue Router**, layout responsif **Bootstrap 5**, sistem autentikasi **Supabase Auth**, notifikasi Toast & dialog Modal Bootstrap, unit tests dengan **Vitest**, serta kebijakan keamanan **Row Level Security (RLS)** untuk Supabase.
 
-## Fitur
+---
 
-- **Dashboard** — ringkasan informasi usaha.
-- **Master Data** — mengelola produk dan harga.
-- **Persediaan** — melihat dan mengelola stok.
-- **Daftar Pesanan** — mengelola pesanan.
-- **Arus Kas** — mencatat pemasukan dan pengeluaran.
-- **Laba Rugi** — melihat ringkasan laba dan rugi.
+## 🔐 Autentikasi & Akun Pengguna
 
-## Struktur proyek
+Halaman login tersedia di `/login` dengan desain yang selaras dengan seluruh aplikasi.
 
-```text
-usahaku/
-├── index.html                 # Halaman Dashboard dan halaman awal aplikasi
-├── master_data.html            # Halaman Master Data
-├── persediaan.html             # Halaman Persediaan
-├── daftar_pesanan.html         # Halaman Daftar Pesanan
-├── arus_kas.html               # Halaman Arus Kas
-├── laba_rugi.html              # Halaman Laba Rugi
-├── css/
-│   └── style.css               # Gaya bersama seluruh halaman
-└── js/
-    ├── supabase_client.js      # Konfigurasi koneksi Supabase bersama
-    ├── currency_input.js       # Bantuan format input mata uang
-    ├── dashboard.js            # Logika halaman Dashboard
-    ├── master_data.js          # Logika halaman Master Data
-    ├── persedian.js            # Logika halaman Persediaan
-    ├── daftar_pesanan.js       # Logika halaman Daftar Pesanan
-    ├── arus_kas.js             # Logika halaman Arus Kas
-    └── laba_rugi.js            # Logika halaman Laba Rugi
+### Akun Terdaftar:
+- `kholan.childs404@gmail.com` — **KHOLAN MUSTAQIM**
+- `kartikaniadewi@gmail.com` — **NIA DEWI KARTIKA**
+- `muhammadridhaby@gmail.com` — **M RIDHABY**
+- `pebrianyrstn@gmail.com` — **PEBRIAN YURISTIANA**
+- `siswanto7612@gmail.com` — **SISWANTO**
+
+**Password Default**: `adm1nusahaku`
+
+---
+
+## 👤 Menu Profil (`/profile`)
+
+- **Card 1: Profil Pengguna**:
+  - Avatar lingkaran menggunakan inisial nama pengguna (misal: **KM**, **NK**, **MR**, **PY**, **S**).
+  - Nama lengkap dan alamat email aktif.
+  - Badge peran "Admin UsahaKu" dan status terverifikasi.
+  - Tombol keluar (Logout) dengan modal konfirmasi.
+- **Card 2: Ubah Kata Sandi**:
+  - Kolom password saat ini, password baru, dan konfirmasi password baru.
+  - Validasi kecocokan dan enkripsi pembaruan sandi langsung via Supabase Auth.
+
+---
+
+## 🛡️ Kebijakan Row Level Security (RLS) Supabase
+
+File SQL lengkap untuk memperbarui tabel, mengunci akses hanya untuk pengguna yang login, dan menambahkan user ke Supabase Auth tersedia di [`supabase_auth_rls_policies.sql`](./supabase_auth_rls_policies.sql).
+
+### Cara Menerapkan di Supabase:
+1. Buka dashboard proyek Supabase Anda: [https://supabase.com/dashboard](https://supabase.com/dashboard)
+2. Masuk ke menu **SQL Editor**.
+3. Buka file [`supabase_auth_rls_policies.sql`](./supabase_auth_rls_policies.sql), salin kodenya, dan tempel ke query editor.
+4. Klik **Run** untuk mengeksekusi.
+5. Akses anonim publik akan dicabut dan seluruh operasi data hanya diizinkan untuk pengguna yang telah terautentikasi (`authenticated`).
+
+---
+
+## 🧪 Menjalankan Unit Tests
+
+Seluruh logika bisnis inti dan utilitas autentikasi diuji menggunakan **Vitest**:
+
+```bash
+npm test
 ```
 
-> Nama file `persedian.js` mengikuti nama file yang saat ini dipakai di proyek.
+Pengujian mencakup:
+- Pemformatan mata uang Rupiah & desimal (`formatRupiah`, `parseNominal`, `formatPendek`)
+- Inisial profil pengguna & daftar email sah (`getInitials`, `REGISTERED_USERS`)
+- Validasi data produk (`validasiProduk`)
+- Perhitungan lapisan persediaan FIFO & HPP (`hitungEstimasiHppFIFO`)
+- Pengelompokan pesanan, laba, & margin % (`kelompokkanPesanan`)
+- Ringkasan arus kas periode & saldo bisnis (`hitungRingkasanKas`)
+- Laporan Laba Rugi aktual & proyeksi (`hitungLabaRugi`)
 
-## Persiapan
+---
 
-1. Pasang **Visual Studio Code**.
-2. Pasang ekstensi **Live Server** di Visual Studio Code.
-3. Pastikan komputer terhubung ke internet. Aplikasi memuat Supabase JS dan jsPDF dari CDN.
-4. Pastikan proyek Supabase yang dipakai masih aktif dan kebijakan akses datanya sudah dikonfigurasi dengan aman.
+## 💻 Menjalankan Aplikasi Lokal
 
-## Menjalankan aplikasi di komputer
+```bash
+# Jalankan server pengembangan
+npm run dev
 
-1. Unduh atau clone repository ini, lalu buka folder `usahaku` di Visual Studio Code.
-2. Di panel Explorer, klik kanan `index.html`.
-3. Pilih **Open with Live Server**.
-4. Aplikasi akan terbuka di browser. Gunakan menu navigasi untuk membuka halaman lainnya.
-
-Jangan membuka file HTML dengan cara klik dua kali (`file://`). Jalankan melalui server lokal seperti Live Server agar halaman bekerja dengan benar.
-
-## Koneksi Supabase dan keamanan
-
-Pengaturan koneksi bersama berada di `js/supabase_client.js`. Aplikasi browser menggunakan **anon/publishable key** Supabase; key tersebut memang dapat terlihat oleh pengguna aplikasi. Keamanan data harus diatur melalui **Row Level Security (RLS)** dan kebijakan akses yang sesuai pada tabel Supabase.
-
-Jangan pernah memasukkan `service_role` key, kata sandi database, atau rahasia server ke file HTML/JavaScript yang dikirim ke browser atau ke repository. Sebelum membagikan aplikasi, pemilik proyek perlu memastikan RLS aktif dan akses setiap tabel hanya mengizinkan tindakan yang memang diperlukan.
-
-Teman kelompok yang menjalankan aplikasi juga perlu memiliki akses internet dan menggunakan konfigurasi Supabase yang sama. Jangan mengirimkan kredensial pribadi melalui repository.
-
-## Bekerja bersama melalui GitHub
-
-1. Pemilik repository mengundang anggota kelompok sebagai collaborator melalui pengaturan akses repository GitHub.
-2. Setiap anggota menerima dan menyetujui undangan tersebut.
-3. Anggota clone repository ke komputernya, lalu membuka folder proyek di Visual Studio Code.
-4. Jalankan `index.html` dengan Live Server.
-5. Sebelum mengirim perubahan, ambil perubahan terbaru dari repository dan periksa perubahan lokal agar pekerjaan anggota tidak saling menimpa.
-
-Repository GitHub berisi kode sumber. Agar aplikasi dapat dibuka sebagai situs melalui sebuah URL, proyek perlu dipublikasikan menggunakan hosting web yang sesuai; mengundang collaborator saja tidak membuat situs otomatis terbit.
+# Kompilasi aplikasi untuk produksi
+npm run build
+```
+Aplikasi berjalan secara default di `http://localhost:3000`.
