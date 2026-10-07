@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <main class="page-container">
     <header class="pagehead">
       <h1>Stok / Inventori</h1>
@@ -289,7 +289,7 @@
             <td>{{ t.qty }}</td>
             <td>{{ t.hppDisplay }}</td>
             <td>{{ t.nilaiDisplay }}</td>
-            <td>{{ t.sumber || '-' }}</td>
+            <td>{{ t.sumber === 'Manual' ? 'Pembelian / restock' : (t.sumber || '-') }}</td>
             <td>{{ t.keterangan || '-' }}</td>
             <td>
               <div v-if="t.jenis === 'Masuk'" class="d-flex align-items-center gap-1">

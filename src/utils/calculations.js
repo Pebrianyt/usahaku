@@ -1,4 +1,4 @@
-// UsahaKu Business Calculations Module
+﻿// UsahaKu Business Calculations Module
 
 export function kelompokkanPesanan(listPesanan, mapProduk = {}, hppPerPesanan = new Map()) {
   const normalisasiTeks = nilai => String(nilai || '').trim().toLocaleLowerCase('id-ID');

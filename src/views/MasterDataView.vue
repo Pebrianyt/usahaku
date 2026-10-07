@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <main class="page-container">
     <header class="pagehead">
       <h1>Produk & Harga</h1>

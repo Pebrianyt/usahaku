@@ -277,16 +277,11 @@ export default {
         doc.text('Nilai', left + leftWidth - 4, 63, { align: 'right' });
 
         const ringkasan = [
-          ['Omzet Realisasi', formatRupiah(data.omzetRealisasi)],
-          ['Omzet Potential', formatRupiah(data.omzetPotential)],
-          ['Total Omzet Proyeksi', formatRupiah(data.totalOmzet)],
-          ['HPP Realisasi', formatRupiah(data.hppRealisasi)],
-          ['HPP Proyeksi Total', formatRupiah(data.hppBulan)],
-          ['Laba Kotor Realisasi', formatRupiah(data.labaKotorRealisasi)],
-          ['Laba Kotor Proyeksi', formatRupiah(data.labaKotorProyeksi)],
-          ['Biaya Operasional', formatRupiah(data.biayaOperasional)],
-          ['Laba Bersih Realisasi', formatRupiah(data.labaBersihRealisasi)],
-          ['Laba Bersih Proyeksi', formatRupiah(data.labaBersihProyeksi)]
+          ['Pendapatan', formatRupiah(data.omzetRealisasi), false],
+          ['Jumlah Beban Pokok Penjualan', formatRupiah(data.hppRealisasi), false],
+          ['Laba Kotor', formatRupiah(data.labaKotorRealisasi), true],
+          ['Biaya Operasional', formatRupiah(data.biayaOperasional), false],
+          ['Laba Bersih', formatRupiah(data.labaBersihRealisasi), true]
         ];
 
         let rowY = 67;
@@ -295,7 +290,7 @@ export default {
             doc.setFillColor(247, 245, 241);
             doc.rect(left, rowY, leftWidth, 10, 'F');
           }
-          doc.setFont('helvetica', index === 2 || index === 5 || index === 9 ? 'bold' : 'normal');
+          doc.setFont('helvetica', row[2] ? 'bold' : 'normal');
           doc.setFontSize(8.5);
           doc.setTextColor(...ink);
           doc.text(row[0], left + 4, rowY + 6.6);
@@ -304,7 +299,7 @@ export default {
         });
 
         // Right Margin Analysis Boxes
-        const buatKotakMargin = (y, judul, aktual, proyeksi) => {
+        const buatKotakMargin = (y, judul, nilai) => {
           doc.setFillColor(247, 245, 241);
           doc.setDrawColor(231, 227, 219);
           doc.roundedRect(right, y, 93, 42, 3, 3, 'FD');
@@ -319,20 +314,18 @@ export default {
           doc.setFontSize(9);
           doc.setTextColor(...sub);
           doc.text('Realisasi', right + 6, y + 21);
-          doc.text('Proyeksi', right + 6, y + 33);
           doc.setFont('helvetica', 'bold');
           doc.setFontSize(12);
           doc.setTextColor(...ink);
-          doc.text(aktual, right + 87, y + 21, { align: 'right' });
-          doc.text(proyeksi, right + 87, y + 33, { align: 'right' });
+          doc.text(nilai, right + 87, y + 21, { align: 'right' });
         };
 
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(14);
         doc.setTextColor(...ink);
         doc.text('Analisis Margin', right, 49);
-        buatKotakMargin(55, 'MARGIN LABA KOTOR', `${data.gpmRealisasi.toFixed(2)}%`, `${data.gpmProyeksi.toFixed(2)}%`);
-        buatKotakMargin(105, 'MARGIN LABA BERSIH', `${data.npmRealisasi.toFixed(2)}%`, `${data.npmProyeksi.toFixed(2)}%`);
+        buatKotakMargin(55, 'MARGIN LABA KOTOR', `${data.gpmRealisasi.toFixed(2)}%`);
+        buatKotakMargin(105, 'MARGIN LABA BERSIH', `${data.npmRealisasi.toFixed(2)}%`);
 
         // Notes Box
         doc.setFillColor(247, 245, 241);
@@ -344,7 +337,7 @@ export default {
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(7.5);
         doc.setTextColor(...sub);
-        doc.text('Proyeksi mencakup pesanan pending.', right + 5, 169);
+        doc.text('Laporan hanya memuat transaksi realisasi.', right + 5, 169);
         doc.text('HPP dihitung berdasarkan FIFO.', right + 5, 175);
 
         // Footer Line
