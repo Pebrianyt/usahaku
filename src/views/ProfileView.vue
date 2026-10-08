@@ -15,7 +15,7 @@
             <!-- Avatar Initial -->
             <div 
               class="profile-avatar d-flex align-items-center justify-content-center shadow-sm mb-3"
-              style="width: 88px; height: 88px; border-radius: 50%; background: var(--brand, #9bbe92); color: #ffffff; font-weight: 700; font-size: 32px; border: 3px solid var(--line, #E7E3DB);"
+              style="width: 88px; height: 88px; border-radius: 50%; background: var(--brand, #167A55); color: #ffffff; font-weight: 700; font-size: 32px; border: 3px solid var(--line, #E7E3DB);"
             >
               {{ currentUser?.initials || 'U' }}
             </div>
@@ -26,8 +26,18 @@
             </h3>
             <p class="text-secondary small mb-2">{{ currentUser?.email || '-' }}</p>
 
-            <span class="badge" style="background: #EAF3EF; color: #1F7A43; padding: 6px 12px; font-weight: 600; font-size: 12px; border-radius: 100px;">
-              Admin UsahaKu
+            <span 
+              class="badge text-uppercase" 
+              :style="{
+                background: currentUser?.role === 'owner' ? '#FCEFDD' : 'var(--brand-ink)',
+                color: currentUser?.role === 'owner' ? '#B4700F' : 'var(--brand-text)',
+                padding: '6px 14px',
+                fontWeight: '600',
+                fontSize: '12px',
+                borderRadius: '100px'
+              }"
+            >
+              {{ currentUser?.role === 'owner' ? 'Owner UsahaKu' : 'Admin UsahaKu' }}
             </span>
           </div>
 
@@ -65,7 +75,7 @@
           <p class="text-secondary small mb-4">Pastikan kata sandi baru Anda minimal 6 karakter dan sulit ditebak oleh orang lain.</p>
 
           <form @submit.prevent="handleUpdatePassword" class="d-flex flex-column gap-3 p-0 border-0 bg-transparent">
-            <div>
+            <div class="w-100">
               <label for="passwordSekarang" class="form-label small fw-medium mb-1">Password Sekarang</label>
               <div class="input-group">
                 <input 
@@ -87,7 +97,7 @@
               </div>
             </div>
 
-            <div>
+            <div class="w-100">
               <label for="passwordBaru" class="form-label small fw-medium mb-1">Password Baru</label>
               <div class="input-group">
                 <input 
@@ -110,7 +120,7 @@
               </div>
             </div>
 
-            <div>
+            <div class="w-100">
               <label for="konfirmasiPasswordBaru" class="form-label small fw-medium mb-1">Konfirmasi Password Baru</label>
               <div class="input-group">
                 <input 
@@ -137,7 +147,7 @@
               <button 
                 type="submit" 
                 class="btn btn-primary px-4 py-2 fw-medium text-white d-flex align-items-center gap-2"
-                style="background: var(--brand, #9bbe92); border-color: var(--brand, #9bbe92); border-radius: 8px;"
+                style="background: var(--brand, #167A55); border-color: var(--brand, #167A55); border-radius: 8px;"
                 :disabled="isUpdating"
               >
                 <span v-if="isUpdating" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -223,6 +233,6 @@ export default {
 
 <style scoped>
 .profile-avatar {
-  background: var(--brand, #9bbe92);
+  background: var(--brand, #167A55);
 }
 </style>

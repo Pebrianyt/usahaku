@@ -1,5 +1,5 @@
 <template>
-  <div class="app-layout min-vw-100" :class="{ 'is-login-page': isLoginPage }">
+  <div class="app-layout" :class="{ 'is-login-page': isLoginPage }">
     <AppNavbar v-if="!isLoginPage" />
     <RouterView />
     <NotificationToast />
@@ -28,10 +28,29 @@ export default {
 </script>
 
 <style>
+#app {
+  width: 100%;
+}
+
+.app-layout {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.app-layout.is-login-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
 /* Responsive layout adjustments for devices */
 @media (max-width: 991.98px) {
   main {
     width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
     margin-left: 0 !important;
     padding: 16px 16px 60px !important;
   }

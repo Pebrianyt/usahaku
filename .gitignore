@@ -2,3 +2,6 @@ node_modules/
 .DS_Store
 *.local
 .env
+/docs/inspect-supabase-rpc-schema.sql
+/docs/edit_pesanan_fifo.sql
+/docs/hapus_grup_pesanan_fifo.sql
