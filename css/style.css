@@ -30,7 +30,7 @@ nav.topnav a.active{background:var(--brand-ink); color:var(--brand);}
 nav.topnav a:not(.active):hover{background:var(--line);}
 
 /* Tata letak landmark konten utama pada seluruh halaman fitur. */
-main{flex:0 1 auto; width:calc(100% - 220px); min-width:0; margin-left:220px; padding:28px 32px 60px; max-width:1080px;}
+main{flex:0 1 auto; width:calc(100% - 220px); min-width:0; margin-left:220px; padding:28px 32px 60px;}
 header.pagehead{margin-bottom:22px;}
 header.pagehead h1{font-size:22px; margin:0 0 4px;}
 header.pagehead p{margin:0; color:var(--sub); font-size:14px;}
@@ -46,9 +46,9 @@ form{
   background:var(--panel); border:1px solid var(--line); border-radius:var(--r);
   padding:16px; display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; align-items:center;
 }
-input, select{
+input:not([type="radio"]):not([type="checkbox"]), select{
   padding:9px 10px; border:1px solid var(--line); border-radius:8px; font-size:13.5px;
-  flex:1; min-width:130px; background:var(--bg);
+  flex:1; background:var(--bg);
 }
 .inputRupiah{
   position:relative; display:flex; align-items:center;
@@ -73,7 +73,7 @@ button[type="submit"]:hover{background:#F0EEE9;}
 .fieldGroup>label{display:block;color:var(--sub);font-size:12.5px;font-weight:600;line-height:1.35;}
 .fieldGroup>input,.fieldGroup>select{width:100%;min-width:0;flex:1;}
 .fieldGroup .inputRupiah{width:100%;min-width:0;flex:1;}
-.fieldGroup .inputRupiah input{width:100%;min-width:0;}
+.fieldGroup .inputRupiah input{width:100%;min-width:0;padding-left:32px;}
 
 table{width:100%; border-collapse:collapse; background:var(--panel); border:1px solid var(--line); border-radius:var(--r); overflow:hidden;}
 th, td{text-align:left; padding:12px 16px; font-size:13.5px;}
@@ -111,7 +111,7 @@ td .inputRupiah .prefix{left:8px;}
   form .fieldGroup>input,
   form .fieldGroup>select,
   form .fieldGroup .inputRupiah{flex:0 0 42px; height:42px; min-height:42px;}
-  form .fieldGroup .inputRupiah input{flex:0 0 42px; height:42px;}
+  form .fieldGroup .inputRupiah input{flex:0 0 42px; height:42px; padding-left:32px;}
   form button[type="submit"]{align-self:flex-start;}
   table{display:block; width:100%; min-width:640px; max-width:100%; overflow-x:auto;}
 }

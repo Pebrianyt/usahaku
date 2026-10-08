@@ -92,7 +92,12 @@
 </template>
 
 <script>
-import { loginUser, REGISTERED_USERS, DEFAULT_PASSWORD } from '@/services/auth';
+import { 
+  loginUser, 
+  INITIAL_USERS, 
+  DEFAULT_ADMIN_PASSWORD, 
+  DEFAULT_OWNER_PASSWORD 
+} from '@/services/auth';
 import { showToast } from '@/services/notification';
 
 export default {
@@ -103,13 +108,14 @@ export default {
       password: '',
       showPassword: false,
       isSubmitting: false,
-      registeredUsers: REGISTERED_USERS
+      registeredUsers: INITIAL_USERS
     };
   },
   methods: {
     quickSelectUser(selectedEmail) {
       this.email = selectedEmail;
-      this.password = DEFAULT_PASSWORD;
+      const user = this.registeredUsers[selectedEmail];
+      this.password = user?.defaultPw || (user?.role === 'owner' ? DEFAULT_OWNER_PASSWORD : DEFAULT_ADMIN_PASSWORD);
     },
     async handleLogin() {
       if (!this.email || !this.password) {
@@ -126,7 +132,7 @@ export default {
         return;
       }
 
-      showToast(`Selamat datang kembali, ${result.user.name}!`, 'success');
+      showToast(`Selamat datang kembali, ${result.user.name} (${(result.user.role || 'admin').toUpperCase()})!`, 'success');
       this.$router.push('/');
     }
   }

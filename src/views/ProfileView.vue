@@ -26,8 +26,18 @@
             </h3>
             <p class="text-secondary small mb-2">{{ currentUser?.email || '-' }}</p>
 
-            <span class="badge" style="background: #EAF3EF; color: #1F7A43; padding: 6px 12px; font-weight: 600; font-size: 12px; border-radius: 100px;">
-              Admin UsahaKu
+            <span 
+              class="badge text-uppercase" 
+              :style="{
+                background: currentUser?.role === 'owner' ? '#FCEFDD' : '#EAF3EF',
+                color: currentUser?.role === 'owner' ? '#B4700F' : '#1F7A43',
+                padding: '6px 14px',
+                fontWeight: '600',
+                fontSize: '12px',
+                borderRadius: '100px'
+              }"
+            >
+              {{ currentUser?.role === 'owner' ? 'Owner UsahaKu' : 'Admin UsahaKu' }}
             </span>
           </div>
 
@@ -65,7 +75,7 @@
           <p class="text-secondary small mb-4">Pastikan kata sandi baru Anda minimal 6 karakter dan sulit ditebak oleh orang lain.</p>
 
           <form @submit.prevent="handleUpdatePassword" class="d-flex flex-column gap-3 p-0 border-0 bg-transparent">
-            <div>
+            <div class="w-100">
               <label for="passwordSekarang" class="form-label small fw-medium mb-1">Password Sekarang</label>
               <div class="input-group">
                 <input 
@@ -87,7 +97,7 @@
               </div>
             </div>
 
-            <div>
+            <div class="w-100">
               <label for="passwordBaru" class="form-label small fw-medium mb-1">Password Baru</label>
               <div class="input-group">
                 <input 
@@ -110,7 +120,7 @@
               </div>
             </div>
 
-            <div>
+            <div class="w-100">
               <label for="konfirmasiPasswordBaru" class="form-label small fw-medium mb-1">Konfirmasi Password Baru</label>
               <div class="input-group">
                 <input 

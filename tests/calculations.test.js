@@ -61,13 +61,14 @@ describe('UsahaKu Unit Tests - All Features', () => {
       expect(getInitials('SISWANTO')).toBe('SI');
     });
 
-    it('contains all 5 authorized user emails and default password', () => {
+    it('contains owner and admin roles correctly configured', () => {
       expect(DEFAULT_PASSWORD).toBe('adm1nusahaku');
-      expect(REGISTERED_USERS['kholan.childs404@gmail.com']).toBeDefined();
-      expect(REGISTERED_USERS['kartikaniadewi@gmail.com']).toBeDefined();
-      expect(REGISTERED_USERS['muhammadridhaby@gmail.com']).toBeDefined();
-      expect(REGISTERED_USERS['pebrianyrstn@gmail.com']).toBeDefined();
-      expect(REGISTERED_USERS['siswanto7612@gmail.com']).toBeDefined();
+      expect(REGISTERED_USERS['yangpunya@gmail.com']?.role).toBe('owner');
+      expect(REGISTERED_USERS['kholan.childs404@gmail.com']?.role).toBe('admin');
+      expect(REGISTERED_USERS['kartikaniadewi@gmail.com']?.role).toBe('admin');
+      expect(REGISTERED_USERS['muhammadridhaby@gmail.com']?.role).toBe('admin');
+      expect(REGISTERED_USERS['pebrianyrstn@gmail.com']?.role).toBe('admin');
+      expect(REGISTERED_USERS['siswanto7612@gmail.com']?.role).toBe('admin');
     });
   });
 
@@ -140,8 +141,14 @@ describe('UsahaKu Unit Tests - All Features', () => {
       { id: 3, no_pesanan: 'ORD-002', tanggal_pesanan: '2026-10-02', kode_produk: 1, qty: 1, harga_jual: 30000, total_penghasilan_akhir: 50000, status: 'Realisasi', tanggal_transaksi_masuk: '2026-10-02' }
     ];
 
+    const mockHppMap = new Map([
+      ['1', { total: 50000, allocations: [{ qty: 2, hppPerUnit: 25000, totalHpp: 50000 }] }],
+      ['2', { total: 30000, allocations: [{ qty: 1, hppPerUnit: 30000, totalHpp: 30000 }] }],
+      ['3', { total: 30000, allocations: [{ qty: 1, hppPerUnit: 30000, totalHpp: 30000 }] }]
+    ]);
+
     it('groups multiple order rows by no_pesanan', () => {
-      const grouped = kelompokkanPesanan(mockPesananRows);
+      const grouped = kelompokkanPesanan(mockPesananRows, {}, mockHppMap);
       expect(grouped).toHaveLength(2);
 
       const ord1 = grouped.find(g => g.noPesanan === 'ORD-001');
@@ -155,7 +162,7 @@ describe('UsahaKu Unit Tests - All Features', () => {
     });
 
     it('calculates realized orders properly', () => {
-      const grouped = kelompokkanPesanan(mockPesananRows);
+      const grouped = kelompokkanPesanan(mockPesananRows, {}, mockHppMap);
       const ord2 = grouped.find(g => g.noPesanan === 'ORD-002');
       expect(ord2.status).toBe('Realisasi');
       expect(ord2.profit).toBe(20000);
