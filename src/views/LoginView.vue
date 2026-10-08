@@ -4,7 +4,7 @@
       
       <!-- Brand Header -->
       <div class="text-center mb-4">
-        <div class="mark d-inline-flex align-items-center justify-content-center mx-auto mb-2" style="width: 46px; height: 46px; border-radius: 12px; background: var(--brand, #9bbe92); color: var(--brand-ink, #EAF3EF); font-weight: 700; font-size: 22px;">
+        <div class="mark d-inline-flex align-items-center justify-content-center mx-auto mb-2" style="width: 46px; height: 46px; border-radius: 12px; background: var(--brand, #167A55); color: var(--brand-ink, #E7F3EC); font-weight: 700; font-size: 22px;">
           U
         </div>
         <h1 class="h4 fw-bold mb-1" style="color: var(--ink, #1B2430);">UsahaKu</h1>
@@ -59,7 +59,7 @@
         <button 
           type="submit" 
           class="btn btn-primary w-100 py-2 mt-2 fw-medium text-white d-flex align-items-center justify-content-center gap-2" 
-          style="background: var(--brand, #9bbe92); border-color: var(--brand, #9bbe92); border-radius: 8px;"
+          style="background: var(--brand, #167A55); border-color: var(--brand, #167A55); border-radius: 8px;"
           :disabled="isSubmitting"
         >
           <span v-if="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>

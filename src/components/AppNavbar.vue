@@ -10,8 +10,8 @@
         <span 
           class="badge text-uppercase" 
           :style="{ 
-            background: isOwner ? '#FCEFDD' : '#EAF3EF', 
-            color: isOwner ? '#B4700F' : '#1F7A43',
+            background: isOwner ? '#FCEFDD' : 'var(--brand-ink)', 
+            color: isOwner ? '#B4700F' : 'var(--brand-text)',
             fontSize: '10px'
           }"
         >
@@ -27,7 +27,7 @@
             :style="{ 
               width: '32px', 
               height: '32px', 
-              background: isOwner ? '#B4700F' : 'var(--brand, #9bbe92)', 
+              background: isOwner ? '#B4700F' : 'var(--brand, #167A55)', 
               fontSize: '13px' 
             }"
           >
@@ -186,7 +186,7 @@
             :style="{ 
               width: '34px', 
               height: '34px', 
-              background: isOwner ? '#B4700F' : 'var(--brand, #9bbe92)', 
+              background: isOwner ? '#B4700F' : 'var(--brand, #167A55)', 
               fontSize: '13px' 
             }"
           >
@@ -202,8 +202,8 @@
               <span 
                 class="badge text-uppercase" 
                 :style="{ 
-                  background: isOwner ? '#FCEFDD' : '#EAF3EF', 
-                  color: isOwner ? '#B4700F' : '#1F7A43',
+                  background: isOwner ? '#FCEFDD' : 'var(--brand-ink)', 
+                  color: isOwner ? '#B4700F' : 'var(--brand-text)',
                   fontSize: '9px',
                   padding: '2px 6px'
                 }"

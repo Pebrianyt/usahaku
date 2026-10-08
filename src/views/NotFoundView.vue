@@ -26,7 +26,7 @@
         <RouterLink 
           to="/" 
           class="btn btn-primary px-4 py-2 fw-medium text-white d-flex align-items-center justify-content-center gap-2"
-          style="background: var(--brand, #9bbe92); border-color: var(--brand, #9bbe92); border-radius: 8px;"
+          style="background: var(--brand, #167A55); border-color: var(--brand, #167A55); border-radius: 8px;"
         >
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>

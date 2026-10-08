@@ -9,7 +9,7 @@
         <button 
           type="button" 
           class="btn btn-primary d-inline-flex align-items-center gap-2 text-white px-3 py-2"
-          style="background: var(--brand, #9bbe92); border-color: var(--brand, #9bbe92); border-radius: 8px;"
+          style="background: var(--brand, #167A55); border-color: var(--brand, #167A55); border-radius: 8px;"
           @click="bukaModalTambah"
         >
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
@@ -79,7 +79,7 @@
                   :style="{ 
                     width: '36px', 
                     height: '36px', 
-                    background: u.role === 'owner' ? '#B4700F' : 'var(--brand, #9bbe92)', 
+                    background: u.role === 'owner' ? '#B4700F' : 'var(--brand, #167A55)', 
                     fontSize: '13px' 
                   }"
                 >
@@ -105,7 +105,7 @@
               <span 
                 v-else 
                 class="badge" 
-                style="background: #EAF3EF; color: #1F7A43; padding: 6px 12px; font-weight: 600; font-size: 12px; border-radius: 100px;"
+                style="background: var(--brand-ink); color: var(--brand-text); padding: 6px 12px; font-weight: 600; font-size: 12px; border-radius: 100px;"
               >
                 Admin (Terbatas)
               </span>
@@ -227,7 +227,7 @@
             <button 
               type="submit" 
               class="btn btn-primary text-white d-flex align-items-center gap-2"
-              style="background: var(--brand, #9bbe92); border-color: var(--brand, #9bbe92);"
+              style="background: var(--brand, #167A55); border-color: var(--brand, #167A55);"
               :disabled="sedangProses"
             >
               <span v-if="sedangProses" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>

@@ -15,7 +15,7 @@
             <!-- Avatar Initial -->
             <div 
               class="profile-avatar d-flex align-items-center justify-content-center shadow-sm mb-3"
-              style="width: 88px; height: 88px; border-radius: 50%; background: var(--brand, #9bbe92); color: #ffffff; font-weight: 700; font-size: 32px; border: 3px solid var(--line, #E7E3DB);"
+              style="width: 88px; height: 88px; border-radius: 50%; background: var(--brand, #167A55); color: #ffffff; font-weight: 700; font-size: 32px; border: 3px solid var(--line, #E7E3DB);"
             >
               {{ currentUser?.initials || 'U' }}
             </div>
@@ -29,8 +29,8 @@
             <span 
               class="badge text-uppercase" 
               :style="{
-                background: currentUser?.role === 'owner' ? '#FCEFDD' : '#EAF3EF',
-                color: currentUser?.role === 'owner' ? '#B4700F' : '#1F7A43',
+                background: currentUser?.role === 'owner' ? '#FCEFDD' : 'var(--brand-ink)',
+                color: currentUser?.role === 'owner' ? '#B4700F' : 'var(--brand-text)',
                 padding: '6px 14px',
                 fontWeight: '600',
                 fontSize: '12px',
@@ -147,7 +147,7 @@
               <button 
                 type="submit" 
                 class="btn btn-primary px-4 py-2 fw-medium text-white d-flex align-items-center gap-2"
-                style="background: var(--brand, #9bbe92); border-color: var(--brand, #9bbe92); border-radius: 8px;"
+                style="background: var(--brand, #167A55); border-color: var(--brand, #167A55); border-radius: 8px;"
                 :disabled="isUpdating"
               >
                 <span v-if="isUpdating" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -233,6 +233,6 @@ export default {
 
 <style scoped>
 .profile-avatar {
-  background: var(--brand, #9bbe92);
+  background: var(--brand, #167A55);
 }
 </style>

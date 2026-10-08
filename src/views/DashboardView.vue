@@ -87,7 +87,7 @@
                 width="24"
                 :height="item.count > 0 ? Math.max(2, 247 * item.count / chartPesananMax) : 0"
                 rx="3"
-                fill="#6E9B66"
+                fill="var(--brand)"
                 class="chartBar"
               >
                 <title>{{ item.label }}: {{ item.count }} pesanan</title>
@@ -140,7 +140,7 @@
                 width="16"
                 :height="item.realisasi > 0 ? Math.max(2, 247 * item.realisasi / chartOmzetMax) : 0"
                 rx="3"
-                fill="#6E9B66"
+                fill="var(--brand)"
                 class="chartBar"
               >
                 <title>{{ item.label }} — Realisasi: {{ formatRupiah(item.realisasi) }}</title>
@@ -205,7 +205,7 @@
                 width="16"
                 :height="item.masuk > 0 ? Math.max(2, 247 * item.masuk / chartKasMax) : 0"
                 rx="3"
-                fill="#6E9B66"
+                fill="var(--brand)"
                 class="chartBar"
               >
                 <title>{{ item.label }} — Uang Masuk: {{ formatRupiah(item.masuk) }}</title>
@@ -294,7 +294,7 @@ export default {
       semuaTransaksiStok: [],
       semuaAlokasiStok: [],
       semuaTransaksiKas: [],
-      paretoColors: ['#6E9B66', '#D98E2B', '#5385A6', '#8769A0', '#4A928F']
+      paretoColors: ['#167A55', '#D98E2B', '#5385A6', '#8769A0', '#4A928F']
     };
   },
   computed: {

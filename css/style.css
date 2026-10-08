@@ -1,8 +1,11 @@
 /* Token warna dan fondasi tampilan bersama untuk semua halaman HTML. */
 :root{
   --bg:#F7F5F1; --panel:#FFFFFF; --ink:#1B2430; --sub:#6B7480;
-  --line:#E7E3DB; --brand:#9bbe92; --brand-ink:#EAF3EF;
+  --line:#E7E3DB; --brand:#167A55; --brand-hover:#105F42;
+  --brand-ink:#E7F3EC; --brand-text:#145C43;
   --accent:#D98E2B; --danger:#C25B4A; --r:14px;
+  --bs-primary:#167A55; --bs-primary-rgb:22,122,85;
+  --bs-success:#167A55; --bs-success-rgb:22,122,85;
 }
 *{box-sizing:border-box;}
 body{
@@ -26,7 +29,7 @@ nav.topnav a{
   display:flex; align-items:center; padding:10px 12px; border-radius:10px;
   color:var(--sub); font-size:14.5px; text-decoration:none; font-weight:600;
 }
-nav.topnav a.active{background:var(--brand-ink); color:var(--brand);}
+nav.topnav a.active{background:var(--brand-ink); color:var(--brand-text);}
 nav.topnav a:not(.active):hover{background:var(--line);}
 
 /* Tata letak landmark konten utama pada seluruh halaman fitur. */
@@ -145,6 +148,20 @@ button[type="submit"].btnIcon.btnTambah::after{width:3px; height:16px;}
 
 .btnIcon.btnEdit{color:#1B2430;}
 .btnIcon.btnHapus{color:#1B2430;}
+
+/* Aksen utama memakai hijau zamrud dengan kontras yang jelas. */
+.btn-success,
+.btn-primary{
+  --bs-btn-bg:var(--brand);
+  --bs-btn-border-color:var(--brand);
+  --bs-btn-hover-bg:var(--brand-hover);
+  --bs-btn-hover-border-color:var(--brand-hover);
+  --bs-btn-active-bg:var(--brand-hover);
+  --bs-btn-active-border-color:var(--brand-hover);
+  --bs-btn-disabled-bg:var(--brand);
+  --bs-btn-disabled-border-color:var(--brand);
+  --bs-btn-focus-shadow-rgb:22,122,85;
+}
 
 /* Khusus daftar_pesanan.html: pilihan massal dan tabel pesanan. */
 .bulkbar{display:flex; align-items:center; gap:10px; margin-bottom:12px;}
