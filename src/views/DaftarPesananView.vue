@@ -158,6 +158,14 @@
         <span v-if="selectedProfitTotal > 0" class="small text-secondary me-2">
           Profit Terpilih: <strong class="text-success">{{ formatRupiah(selectedProfitTotal) }}</strong>
         </span>
+        <button
+          type="button"
+          class="btn btn-sm btn-outline-success"
+          @click="bukaBulkRealisasi"
+          :disabled="!groupedOrders.some(g => g.status !== 'Realisasi')"
+        >
+          Realisasi banyak nomor
+        </button>
         <button 
           type="button" 
           id="btnRealisasiTerpilih" 
@@ -169,6 +177,36 @@
         </button>
       </div>
     </section>
+
+    <div v-if="bulkModalOpen" class="bulk-modal-backdrop" @click.self="tutupBulkRealisasi" @keydown.esc="tutupBulkRealisasi">
+      <section class="bulk-modal card shadow" role="dialog" aria-modal="true" aria-labelledby="bulkModalTitle">
+        <header class="d-flex justify-content-between align-items-start gap-3 mb-3">
+          <div>
+            <h2 id="bulkModalTitle" class="h5 mb-1">Realisasi banyak pesanan</h2>
+            <p class="small text-secondary mb-0">Tempel nomor pesanan, satu nomor per baris atau pisahkan dengan koma.</p>
+          </div>
+          <button type="button" class="btn-close" aria-label="Tutup" @click="tutupBulkRealisasi"></button>
+        </header>
+        <label for="bulkNomorPesanan" class="form-label small fw-medium">Nomor pesanan</label>
+        <textarea id="bulkNomorPesanan" v-model="bulkNomorInput" class="form-control" rows="5" placeholder="ORD-001&#10;ORD-002" @input="jadwalkanBulkLookup"></textarea>
+        <p class="small text-secondary mt-2 mb-2" aria-live="polite">{{ bulkLookupMessage }}</p>
+        <div class="bulk-results">
+          <label v-for="entry in bulkMatches" :key="entry.key" class="bulk-result d-flex align-items-center gap-2 py-2 border-bottom">
+            <input type="checkbox" class="form-check-input mt-0" :value="entry.key" v-model="bulkSelectedKeys">
+            <span class="fw-medium">{{ entry.noPesanan }}</span>
+            <span class="small text-secondary ms-auto">{{ entry.status }} · {{ entry.tanggal }}</span>
+          </label>
+          <p v-if="bulkHasLookedUp && bulkMatches.length === 0" class="small text-secondary mb-0">Tidak ada nomor pending yang cocok.</p>
+        </div>
+        <footer class="d-flex justify-content-between align-items-center gap-2 mt-3">
+          <span class="small text-secondary">{{ bulkSelectedKeys.length }} pesanan dipilih</span>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-sm btn-light border" @click="tutupBulkRealisasi">Batal</button>
+            <button type="button" class="btn btn-sm btn-success" :disabled="!bulkSelectedKeys.length || isBulkSubmitting" @click="realisasikanBulkTerpilih">{{ isBulkSubmitting ? 'Menyimpan...' : 'Tandai realisasi' }}</button>
+          </div>
+        </footer>
+      </section>
+    </div>
 
     <!-- Search & Filter Controls -->
     <section class="pesananFilters d-flex gap-3 flex-wrap mb-3" aria-label="Filter daftar pesanan">
@@ -196,8 +234,8 @@
         <thead>
           <tr>
             <th scope="col" style="width: 40px;"></th>
-            <th scope="col">No Pesanan</th>
-            <th scope="col">Tanggal</th>
+            <th scope="col"><button type="button" class="sort-button" @click="ubahUrutan('noPesanan')">No Pesanan <span>{{ sortIndicator('noPesanan') }}</span></button></th>
+            <th scope="col"><button type="button" class="sort-button" @click="ubahUrutan('tanggal')">Tanggal <span>{{ sortIndicator('tanggal') }}</span></button></th>
             <th scope="col">Produk</th>
             <th scope="col" style="width: 60px;">Qty</th>
             <th scope="col">Total HPP<br>Produk</th>
@@ -205,7 +243,7 @@
             <th scope="col">Total HPP<br>Pesanan</th>
             <th scope="col">Profit<br>Penjualan</th>
             <th scope="col">Margin</th>
-            <th scope="col">Status</th>
+            <th scope="col"><button type="button" class="sort-button" @click="ubahUrutan('status')">Status <span>{{ sortIndicator('status') }}</span></button></th>
             <th scope="col" style="width: 90px;">Aksi</th>
           </tr>
         </thead>
@@ -215,7 +253,7 @@
               Belum ada data pesanan yang sesuai filter.
             </td>
           </tr>
-          <template v-for="group in filteredGroups" :key="group.key">
+              <template v-for="group in paginatedGroups" :key="group.key">
             <tr 
               v-for="(item, index) in group.displayRows" 
               :key="group.key + '-' + item.displayKey"
@@ -291,6 +329,20 @@
         </tbody>
       </table>
     </div>
+    <nav class="table-pagination d-flex align-items-center justify-content-between flex-wrap gap-2 py-3" aria-label="Pagination daftar pesanan">
+      <div class="d-flex align-items-center gap-2 small text-secondary">
+        <label for="pageSize">Baris per halaman</label>
+        <select id="pageSize" v-model.number="pageSize" class="form-select form-select-sm" style="width: auto" @change="currentPage = 1">
+          <option :value="10">10</option><option :value="25">25</option><option :value="50">50</option>
+        </select>
+        <span>{{ filteredGroups.length ? `${(currentPage - 1) * pageSize + 1}–${Math.min(currentPage * pageSize, filteredGroups.length)} dari ${filteredGroups.length}` : '0 pesanan' }}</span>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <button type="button" class="btn btn-sm btn-light border" :disabled="currentPage <= 1" @click="currentPage--">Sebelumnya</button>
+        <span class="small text-secondary">{{ currentPage }} / {{ pageCount }}</span>
+        <button type="button" class="btn btn-sm btn-light border" :disabled="currentPage >= pageCount" @click="currentPage++">Berikutnya</button>
+      </div>
+    </nav>
   </main>
 </template>
 
@@ -322,7 +374,19 @@ export default {
       isCheckAll: false,
       filterCari: '',
       filterBulan: '',
-      filterStatus: ''
+      filterStatus: '',
+      currentPage: 1,
+      pageSize: 10,
+      sortBy: 'tanggal',
+      sortDirection: 'desc',
+      bulkModalOpen: false,
+      bulkNomorInput: '',
+      bulkMatches: [],
+      bulkSelectedKeys: [],
+      bulkLookupMessage: 'Nomor yang cocok akan muncul setelah kamu berhenti mengetik.',
+      bulkHasLookedUp: false,
+      isBulkSubmitting: false,
+      bulkLookupTimer: null
     };
   },
   computed: {
@@ -376,7 +440,7 @@ export default {
       const bulan = this.filterBulan;
       const status = this.filterStatus;
 
-      return this.groupedOrders.filter(group => {
+      const groups = this.groupedOrders.filter(group => {
         const cocokCari = !cari || 
           group.noPesanan.toLocaleLowerCase('id-ID').includes(cari) ||
           group.rows.some(r => (r.nama_produk || '').toLocaleLowerCase('id-ID').includes(cari));
@@ -384,6 +448,19 @@ export default {
         const cocokStatus = !status || group.status === status;
         return cocokCari && cocokBulan && cocokStatus;
       });
+      const direction = this.sortDirection === 'asc' ? 1 : -1;
+      return groups.sort((a, b) => {
+        const av = a[this.sortBy] ?? '';
+        const bv = b[this.sortBy] ?? '';
+        return String(av).localeCompare(String(bv), 'id-ID', { numeric: true, sensitivity: 'base' }) * direction;
+      });
+    },
+    pageCount() {
+      return Math.max(1, Math.ceil(this.filteredGroups.length / this.pageSize));
+    },
+    paginatedGroups() {
+      const start = (this.currentPage - 1) * this.pageSize;
+      return this.filteredGroups.slice(start, start + this.pageSize);
     },
     selectedProfitTotal() {
       return this.filteredGroups
@@ -394,6 +471,65 @@ export default {
   methods: {
     formatKode,
     formatRupiah,
+    sortIndicator(column) {
+      return this.sortBy === column ? (this.sortDirection === 'asc' ? '↑' : '↓') : '↕';
+    },
+    ubahUrutan(column) {
+      if (this.sortBy === column) this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+      else { this.sortBy = column; this.sortDirection = 'asc'; }
+    },
+    bukaBulkRealisasi() {
+      this.bulkNomorInput = '';
+      this.bulkMatches = [];
+      this.bulkSelectedKeys = [];
+      this.bulkHasLookedUp = false;
+      this.bulkLookupMessage = 'Nomor yang cocok akan muncul setelah kamu berhenti mengetik.';
+      this.bulkModalOpen = true;
+      this.$nextTick(() => document.getElementById('bulkNomorPesanan')?.focus());
+    },
+    tutupBulkRealisasi() {
+      this.bulkModalOpen = false;
+      clearTimeout(this.bulkLookupTimer);
+    },
+    jadwalkanBulkLookup() {
+      clearTimeout(this.bulkLookupTimer);
+      this.bulkLookupMessage = 'Mencari nomor pesanan...';
+      this.bulkHasLookedUp = false;
+      this.bulkLookupTimer = setTimeout(() => this.cariNomorBulk(), 450);
+    },
+    cariNomorBulk() {
+      const inputNumbers = [...new Set(this.bulkNomorInput.split(/[\n,;\t]+/).map(value => value.trim()).filter(Boolean))];
+      const normalized = new Set(inputNumbers.map(value => value.toLocaleLowerCase('id-ID')));
+      this.bulkMatches = this.groupedOrders.filter(group =>
+        group.status !== 'Realisasi' && normalized.has(group.noPesanan.trim().toLocaleLowerCase('id-ID'))
+      );
+      this.bulkSelectedKeys = this.bulkMatches.map(group => group.key);
+      this.bulkHasLookedUp = true;
+      const matched = new Set(this.bulkMatches.map(group => group.noPesanan.trim().toLocaleLowerCase('id-ID')));
+      const missing = inputNumbers.filter(value => !matched.has(value.toLocaleLowerCase('id-ID')));
+      this.bulkLookupMessage = missing.length
+        ? `${this.bulkMatches.length} nomor pending cocok; ${missing.length} nomor tidak ditemukan atau sudah realisasi.`
+        : `${this.bulkMatches.length} nomor pesanan pending cocok.`;
+    },
+    async realisasikanBulkTerpilih() {
+      const groups = this.bulkMatches.filter(group => this.bulkSelectedKeys.includes(group.key));
+      if (!groups.length || this.isBulkSubmitting) return;
+      this.isBulkSubmitting = true;
+      const idList = groups.flatMap(group => group.rows.map(row => String(row.id)));
+      const { error } = await supabase.from('pesanan')
+        .update({ status: 'Realisasi', tanggal_transaksi_masuk: tanggalLokal() })
+        .in('id', idList);
+      this.isBulkSubmitting = false;
+      if (error) {
+        showToast('Gagal mengubah status pesanan: ' + error.message, 'error');
+        return;
+      }
+      showToast(`${groups.length} pesanan berhasil ditandai Realisasi!`, 'success');
+      this.tutupBulkRealisasi();
+      this.selectedOrderGroups = this.selectedOrderGroups.filter(key => !groups.some(group => group.key === key));
+      this.isCheckAll = false;
+      await this.loadDataPesanan();
+    },
     onTotalAkhirInput(e) {
       this.formTotalAkhirDisplay = formatNominal(e.target.value);
     },
@@ -520,14 +656,27 @@ export default {
             p_items: items
           };
 
-      const { error } = await supabase.rpc(rpcName, rpcArgs);
+      let error;
+      try {
+        ({ error } = await supabase.rpc(rpcName, rpcArgs));
+      } catch (exception) {
+        this.isSubmitting = false;
+        showToast(`Tidak dapat menghubungi server saat ${this.pesananSedangDiedit ? 'mengubah' : 'menyimpan'} pesanan. Periksa koneksi lalu coba lagi.`, 'error');
+        console.error(`RPC ${rpcName} gagal dipanggil:`, exception);
+        return;
+      }
       this.isSubmitting = false;
 
       if (error) {
+        const editLabel = this.pesananSedangDiedit ? 'mengubah' : 'menyimpan';
+        const rpcTidakDitemukan = error.code === 'PGRST202' || /could not find the function|schema cache/i.test(error.message || '');
         const errText = error.code === '23505'
           ? 'Nomor pesanan tersebut sudah digunakan. Gunakan nomor lain.'
-          : 'Gagal menyimpan pesanan: ' + error.message;
+          : rpcTidakDitemukan
+            ? `Fungsi database ${rpcName} belum tersedia atau parameternya berbeda. Perbarui fungsi RPC di Supabase, lalu coba lagi.`
+            : `Gagal ${editLabel} pesanan: ${error.message}`;
         showToast(errText, 'error');
+        console.error(`RPC ${rpcName} mengembalikan error:`, error);
         return;
       }
 
@@ -608,6 +757,13 @@ export default {
   },
   mounted() {
     this.loadDataPesanan();
+  },
+  watch: {
+    filterCari() { this.currentPage = 1; },
+    filterBulan() { this.currentPage = 1; },
+    filterStatus() { this.currentPage = 1; },
+    pageSize() { this.currentPage = 1; },
+    pageCount(value) { if (this.currentPage > value) this.currentPage = value; }
   }
 };
 </script>
@@ -616,4 +772,12 @@ export default {
 .border-top-thick {
   border-top: 2px solid #e2ded5;
 }
+.sort-button { border: 0; padding: 0; background: transparent; color: inherit; font: inherit; font-weight: inherit; text-align: left; white-space: nowrap; }
+.sort-button:hover { color: var(--bs-success); }
+.sort-button span { color: #718096; font-size: .8em; }
+.bulk-modal-backdrop { position: fixed; inset: 0; z-index: 1080; display: grid; place-items: center; padding: 1rem; background: rgb(20 28 36 / 48%); }
+.bulk-modal { width: min(100%, 560px); max-height: min(90vh, 760px); overflow: auto; padding: 1.25rem; border: 0; border-radius: 14px; }
+.bulk-results { max-height: 220px; overflow-y: auto; }
+.bulk-result { cursor: pointer; }
+.table-pagination .form-select { min-height: 31px; }
 </style>
