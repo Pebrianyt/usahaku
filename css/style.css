@@ -31,15 +31,16 @@ nav.topnav a:not(.active):hover{background:var(--line);}
 
 /* Tata letak landmark konten utama pada seluruh halaman fitur. */
 main{flex:0 1 auto; width:calc(100% - 220px); min-width:0; margin-left:220px; padding:28px 32px 60px;}
+.page-container{width:calc(100% - 220px);max-width:calc(100% - 220px);min-width:0;margin-left:220px;}
 header.pagehead{margin-bottom:22px;}
 header.pagehead h1{font-size:22px; margin:0 0 4px;}
 header.pagehead p{margin:0; color:var(--sub); font-size:14px;}
 #status{font-size:12.5px; color:var(--sub); margin:0 0 16px;}
 
 .cards{display:flex; gap:14px; margin-bottom:22px; flex-wrap:wrap;}
-.card{flex:1; min-width:150px; background:var(--panel); border:1px solid var(--line); border-radius:var(--r); padding:16px 18px;}
-.card .label{font-size:12.5px; color:var(--sub); margin-bottom:6px;}
-.card .value{font-size:21px; font-weight:700;}
+.cards>.card{flex:1 1 150px; min-width:150px; background:var(--panel); border:1px solid var(--line); border-radius:var(--r); padding:16px 18px;}
+.cards>.card .label{font-size:12.5px; color:var(--sub); margin-bottom:6px;}
+.cards>.card .value{font-size:21px; font-weight:700;}
 
 /* Gaya bersama untuk form, input, tombol, dan tabel pada halaman fitur. */
 form{
@@ -105,15 +106,16 @@ td .inputRupiah .prefix{left:8px;}
   nav.topnav a{white-space:nowrap;} */
   /* Kurangi jarak konten utama pada layar kecil. */
   main{margin-left:0; width:100%; max-width:none; padding:20px 16px 40px;}
+  .page-container{width:100%;max-width:100%;margin-left:0;}
   /* Susun bidang form secara vertikal pada layar kecil. */
   form{flex-direction:column; align-items:stretch; gap:12px;}
   form .fieldGroup{flex:0 0 auto; width:100%; min-width:0;}
   form .fieldGroup>input,
   form .fieldGroup>select,
-  form .fieldGroup .inputRupiah{flex:0 0 42px; height:42px; min-height:42px;}
-  form .fieldGroup .inputRupiah input{flex:0 0 42px; height:42px; padding-left:32px;}
+  form .fieldGroup .inputRupiah{height:42px; min-height:42px;}
+  form .fieldGroup .inputRupiah input{height:42px; padding-left:32px;}
   form button[type="submit"]{align-self:flex-start;}
-  table{display:block; width:100%; min-width:640px; max-width:100%; overflow-x:auto;}
+  table{display:block; width:100%; min-width:0; max-width:100%; overflow-x:auto;}
 }
 
 /* tombol berbentuk ikon bulat/kotak, tanpa teks — monokrom hitam putih */
@@ -167,7 +169,7 @@ button[type="submit"].btnIcon:hover{
 }
 
 /* Tabel pesanan dibuat rapat agar muat pada lebar halaman. */
-.pesananTableScroll{width:100%;overflow-x:auto;border-radius:var(--r);}
+.pesananTableScroll{width:100%;min-width:0;overflow-x:auto;border-radius:var(--r);}
 .tblPesanan{width:100%;min-width:940px;table-layout:fixed;}
 .tblPesanan th,.tblPesanan td{padding:9px 7px;font-size:12px;overflow-wrap:anywhere;}
 .tblPesanan th{font-size:11.5px;line-height:1.25;}
@@ -378,7 +380,7 @@ button[type="submit"].btnIcon:hover{
   }
 }
 main>h2{margin:24px 0 10px;font-size:18px;}
-.tableScroll{width:100%;overflow-x:auto;margin-bottom:22px;}
+.tableScroll{width:100%;min-width:0;overflow-x:auto;margin-bottom:22px;}
 .tableScroll table{min-width:850px;}
 .stokRiwayatTable th:first-child,.stokRiwayatTable td:first-child{min-width:115px;white-space:nowrap;}
 /* Filter periode dipakai laba_rugi.html dan index.html. */
@@ -480,5 +482,5 @@ nav.topnav a span{line-height:1.3;}
 
 
 /* Gaya judul metrik semantik yang memakai elemen h2 di dalam kartu. */
-.card .label{margin:0 0 6px;font-size:12.5px;font-weight:600;}
+.cards>.card .label{margin:0 0 6px;font-size:12.5px;font-weight:600;}
 

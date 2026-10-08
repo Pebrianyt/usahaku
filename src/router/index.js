@@ -9,7 +9,7 @@ import ProfileView from '@/views/ProfileView.vue';
 import LoginView from '@/views/LoginView.vue';
 import UserManagementView from '@/views/UserManagementView.vue';
 import NotFoundView from '@/views/NotFoundView.vue';
-import { authState } from '@/services/auth';
+import { authState, authReady } from '@/services/auth';
 
 const routes = [
   {
@@ -96,7 +96,8 @@ const router = createRouter({
   }
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
+  await authReady;
   const isPublic = to.meta.public === true;
   const isAuthenticated = !!authState.user;
   const userRole = authState.user?.role || 'admin';

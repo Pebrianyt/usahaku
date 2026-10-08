@@ -67,37 +67,12 @@
         </button>
       </form>
 
-      <!-- Pre-registered accounts helper / quick select -->
-      <div class="mt-3 pt-3 border-top" v-show="false">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <small class="text-secondary fw-semibold">Pilih Cepat Akun:</small>
-          <small class="badge bg-light text-secondary border">Password: adm1nusahaku</small>
-        </div>
-        <div class="d-flex flex-column gap-1">
-          <button 
-            v-for="(info, mail) in registeredUsers" 
-            :key="mail"
-            type="button" 
-            class="btn btn-sm btn-light border text-start d-flex justify-content-between align-items-center py-1 px-2"
-            @click="quickSelectUser(mail)"
-          >
-            <span class="small text-truncate" style="max-width: 220px;">{{ info.name }}</span>
-            <span class="badge text-bg-secondary" style="font-size: 10px;">Pilih</span>
-          </button>
-        </div>
-      </div>
-
     </div>
   </div>
 </template>
 
 <script>
-import { 
-  loginUser, 
-  INITIAL_USERS, 
-  DEFAULT_ADMIN_PASSWORD, 
-  DEFAULT_OWNER_PASSWORD 
-} from '@/services/auth';
+import { loginUser } from '@/services/auth';
 import { showToast } from '@/services/notification';
 
 export default {
@@ -107,16 +82,10 @@ export default {
       email: '',
       password: '',
       showPassword: false,
-      isSubmitting: false,
-      registeredUsers: INITIAL_USERS
+      isSubmitting: false
     };
   },
   methods: {
-    quickSelectUser(selectedEmail) {
-      this.email = selectedEmail;
-      const user = this.registeredUsers[selectedEmail];
-      this.password = user?.defaultPw || (user?.role === 'owner' ? DEFAULT_OWNER_PASSWORD : DEFAULT_ADMIN_PASSWORD);
-    },
     async handleLogin() {
       if (!this.email || !this.password) {
         showToast('Email dan password wajib diisi.', 'warning');
@@ -141,9 +110,13 @@ export default {
 
 <style scoped>
 .login-wrapper {
+  width: 100%;
+  flex: 1 1 auto;
   background: var(--bg, #F7F5F1);
 }
 .login-card {
+  flex: 0 1 440px;
+  margin: auto;
   border-color: var(--line, #E7E3DB) !important;
 }
 </style>

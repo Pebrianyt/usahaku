@@ -114,7 +114,7 @@
               <div class="d-flex align-items-center gap-1">
                 <select 
                   :value="u.role" 
-                  @change="handleGantiRole(u.email, $event.target.value)"
+                  @change="handleGantiRole(u, $event)"
                   class="form-select form-select-sm"
                   style="max-width: 140px; font-size: 12px;"
                   :disabled="sedangProses"
@@ -336,17 +336,26 @@ export default {
       await this.muatDataUser();
     },
     async handleGantiRole(email, newRole) {
+      const oldRole = email.role;
+      const selectedRole = newRole.target.value;
       this.sedangProses = true;
-      const res = await updateAppUserRole(email, newRole);
-      this.sedangProses = false;
+      try {
+        const res = await updateAppUserRole(email.email, selectedRole);
+        if (!res.success) {
+          newRole.target.value = oldRole;
+          showToast(res.error || 'Gagal mengubah peran pengguna.', 'error');
+          return;
+        }
 
-      if (!res.success) {
-        showToast('Gagal mengubah peran pengguna.', 'error');
-        return;
+        email.role = res.user?.role || selectedRole;
+        showToast(`Peran pengguna ${email.email} berhasil diubah menjadi ${selectedRole.toUpperCase()}.`, 'success');
+        await this.muatDataUser();
+      } catch (error) {
+        newRole.target.value = oldRole;
+        showToast(error.message || 'Gagal mengubah peran pengguna.', 'error');
+      } finally {
+        this.sedangProses = false;
       }
-
-      showToast(`Peran pengguna ${email} berhasil diubah menjadi ${newRole.toUpperCase()}.`, 'success');
-      await this.muatDataUser();
     },
     async handleHapusUser(user) {
       const confirmed = await confirmAction(
@@ -361,16 +370,20 @@ export default {
       if (!confirmed) return;
 
       this.sedangProses = true;
-      const res = await deleteAppUser(user.email);
-      this.sedangProses = false;
+      try {
+        const res = await deleteAppUser(user.email);
+        if (!res.success) {
+          showToast(res.error || 'Gagal menghapus pengguna.', 'error');
+          return;
+        }
 
-      if (!res.success) {
-        showToast(res.error || 'Gagal menghapus pengguna.', 'error');
-        return;
+        showToast(`Pengguna ${user.nama} berhasil dihapus.`, 'info');
+        await this.muatDataUser();
+      } catch (error) {
+        showToast(error.message || 'Gagal menghapus pengguna.', 'error');
+      } finally {
+        this.sedangProses = false;
       }
-
-      showToast(`Pengguna ${user.nama} berhasil dihapus.`, 'info');
-      await this.muatDataUser();
     }
   },
   mounted() {
