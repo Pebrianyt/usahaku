@@ -61,18 +61,16 @@
               <text x="53" :y="salesChartY(tick - 1) + 4" text-anchor="end" class="chartAxisLabel">
                 {{ formatPendek(salesChartMax * (1 - (tick - 1) / 4)) }}
               </text>
-            </template>
+            </g>
 
-            <!-- Bars & X Labels -->
-            <template v-for="(item, idx) in chartPesananData" :key="item.key">
-              <rect 
-                :x="58 + (784 / Math.max(chartPesananData.length, 1)) * idx + (784 / Math.max(chartPesananData.length, 1)) / 2 - 12"
-                :y="18 + 247 - (item.count > 0 ? Math.max(2, 247 * item.count / chartPesananMax) : 0)"
-                width="24"
-                :height="item.count > 0 ? Math.max(2, 247 * item.count / chartPesananMax) : 0"
-                rx="3"
-                fill="#6E9B66"
-                class="chartBar"
+            <path v-if="salesChartArea" :d="salesChartArea" class="salesArea" />
+            <polyline v-if="salesChartPoints" :points="salesChartPoints" class="salesLine" />
+            <g v-for="(item, index) in chartSalesData" :key="item.key">
+              <circle
+                :cx="salesChartX(index)"
+                :cy="salesChartValueY(item.total)"
+                r="5"
+                class="salesPoint"
               >
                 <title>{{ item.label }}: {{ formatRupiah(item.total) }}</title>
               </circle>
@@ -131,30 +129,16 @@
               <text x="44" :y="barChartY(tick - 1) + 4" text-anchor="end" class="chartAxisLabel">
                 {{ Math.round(chartPesananMax * (1 - (tick - 1) / 4)) }}
               </text>
-            </template>
+            </g>
 
-            <template v-for="(item, idx) in chartOmzetData" :key="item.key">
-              <!-- Realisasi bar -->
-              <rect 
-                :x="58 + (784 / Math.max(chartOmzetData.length, 1)) * idx + (784 / Math.max(chartOmzetData.length, 1)) / 2 - 18"
-                :y="18 + 247 - (item.realisasi > 0 ? Math.max(2, 247 * item.realisasi / chartOmzetMax) : 0)"
-                width="16"
-                :height="item.realisasi > 0 ? Math.max(2, 247 * item.realisasi / chartOmzetMax) : 0"
-                rx="3"
-                fill="#6E9B66"
-                class="chartBar"
-              >
-                <title>{{ item.label }} — Realisasi: {{ formatRupiah(item.realisasi) }}</title>
-              </rect>
-              <!-- Pending bar -->
-              <rect 
-                :x="58 + (784 / Math.max(chartOmzetData.length, 1)) * idx + (784 / Math.max(chartOmzetData.length, 1)) / 2 + 2"
-                :y="18 + 247 - (item.potential > 0 ? Math.max(2, 247 * item.potential / chartOmzetMax) : 0)"
-                width="16"
-                :height="item.potential > 0 ? Math.max(2, 247 * item.potential / chartOmzetMax) : 0"
-                rx="3"
-                fill="#D98E2B"
-                class="chartBar"
+            <g v-for="(item, index) in chartPesananData" :key="item.key">
+              <rect
+                :x="barChartX(index, chartPesananData.length, 600, 52, 538, 24)"
+                :y="barChartValueY(item.count, chartPesananMax)"
+                width="24"
+                :height="barChartHeight(item.count, chartPesananMax)"
+                rx="4"
+                :class="item.key === selectedMonth ? 'chartBar chartBarCurrent' : 'chartBar'"
               >
                 <title>{{ item.label }}: {{ item.count }} pesanan</title>
               </rect>
@@ -342,7 +326,7 @@
 import { supabase } from '@/services/supabase';
 import { showToast } from '@/services/notification';
 import { formatRupiah, formatPendek, bulanSekarang, rentangBulan } from '@/utils/currency';
-import { authState } from '@/services/auth';
+import { authState, authReady } from '@/services/auth';
 
 const JUMLAH_BULAN_GRAFIK = 12;
 const NAMA_BULAN = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
@@ -695,6 +679,7 @@ export default {
       return { data: semua, error: null };
     },
     async muatDataDashboard() {
+      await authReady;
       const isOwner = this.isOwner;
       this.statusMessage = isOwner
         ? 'Dashboard: Mengambil data produk, pesanan, transaksi stok, alokasi stok, dan transaksi kas...'
@@ -724,6 +709,7 @@ export default {
       this.semuaTransaksiStok = isOwner ? hasil[2].data || [] : [];
       this.semuaAlokasiStok = isOwner ? hasil[3].data || [] : [];
       this.semuaTransaksiKas = isOwner ? hasil[4].data || [] : [];
+      this.statusMessage = `Data berhasil dimuat: ${this.semuaPesanan.length} baris pesanan dan ${this.semuaProduk.length} produk.`;
     }
   },
   mounted() {
