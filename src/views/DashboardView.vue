@@ -61,15 +61,18 @@
               <text x="53" :y="salesChartY(tick - 1) + 4" text-anchor="end" class="chartAxisLabel">
                 {{ formatPendek(salesChartMax * (1 - (tick - 1) / 4)) }}
               </text>
-            </g>
-            <path v-if="salesChartArea" :d="salesChartArea" class="salesArea" />
-            <polyline v-if="salesChartPoints" :points="salesChartPoints" class="salesLine" />
-            <g v-for="(item, index) in chartSalesData" :key="item.key">
-              <circle
-                :cx="salesChartX(index)"
-                :cy="salesChartValueY(item.total)"
-                r="5"
-                class="salesPoint"
+            </template>
+
+            <!-- Bars & X Labels -->
+            <template v-for="(item, idx) in chartPesananData" :key="item.key">
+              <rect 
+                :x="58 + (784 / Math.max(chartPesananData.length, 1)) * idx + (784 / Math.max(chartPesananData.length, 1)) / 2 - 12"
+                :y="18 + 247 - (item.count > 0 ? Math.max(2, 247 * item.count / chartPesananMax) : 0)"
+                width="24"
+                :height="item.count > 0 ? Math.max(2, 247 * item.count / chartPesananMax) : 0"
+                rx="3"
+                fill="#6E9B66"
+                class="chartBar"
               >
                 <title>{{ item.label }}: {{ formatRupiah(item.total) }}</title>
               </circle>
@@ -128,15 +131,30 @@
               <text x="44" :y="barChartY(tick - 1) + 4" text-anchor="end" class="chartAxisLabel">
                 {{ Math.round(chartPesananMax * (1 - (tick - 1) / 4)) }}
               </text>
-            </g>
-            <g v-for="(item, index) in chartPesananData" :key="item.key">
-              <rect
-                :x="barChartX(index, chartPesananData.length, 600, 52, 538, 24)"
-                :y="barChartValueY(item.count, chartPesananMax)"
-                width="24"
-                :height="barChartHeight(item.count, chartPesananMax)"
-                rx="4"
-                :class="item.key === selectedMonth ? 'chartBar chartBarCurrent' : 'chartBar'"
+            </template>
+
+            <template v-for="(item, idx) in chartOmzetData" :key="item.key">
+              <!-- Realisasi bar -->
+              <rect 
+                :x="58 + (784 / Math.max(chartOmzetData.length, 1)) * idx + (784 / Math.max(chartOmzetData.length, 1)) / 2 - 18"
+                :y="18 + 247 - (item.realisasi > 0 ? Math.max(2, 247 * item.realisasi / chartOmzetMax) : 0)"
+                width="16"
+                :height="item.realisasi > 0 ? Math.max(2, 247 * item.realisasi / chartOmzetMax) : 0"
+                rx="3"
+                fill="#6E9B66"
+                class="chartBar"
+              >
+                <title>{{ item.label }} — Realisasi: {{ formatRupiah(item.realisasi) }}</title>
+              </rect>
+              <!-- Pending bar -->
+              <rect 
+                :x="58 + (784 / Math.max(chartOmzetData.length, 1)) * idx + (784 / Math.max(chartOmzetData.length, 1)) / 2 + 2"
+                :y="18 + 247 - (item.potential > 0 ? Math.max(2, 247 * item.potential / chartOmzetMax) : 0)"
+                width="16"
+                :height="item.potential > 0 ? Math.max(2, 247 * item.potential / chartOmzetMax) : 0"
+                rx="3"
+                fill="#D98E2B"
+                class="chartBar"
               >
                 <title>{{ item.label }}: {{ item.count }} pesanan</title>
               </rect>
@@ -179,7 +197,8 @@
                 width="17"
                 :height="barChartHeight(item.masuk, chartKasMax)"
                 rx="3"
-                fill="var(--brand)"
+                fill="#6E9B66"
+                class="chartBar"
               >
                 <title>{{ item.label }} — Uang Masuk: {{ formatRupiah(item.masuk) }}</title>
               </rect>
@@ -338,7 +357,8 @@ export default {
       semuaProduk: [],
       semuaTransaksiStok: [],
       semuaAlokasiStok: [],
-      semuaTransaksiKas: []
+      semuaTransaksiKas: [],
+      paretoColors: ['#6E9B66', '#D98E2B', '#5385A6', '#8769A0', '#4A928F']
     };
   },
   computed: {
