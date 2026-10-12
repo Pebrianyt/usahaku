@@ -4,7 +4,7 @@
       
       <!-- Brand Header -->
       <div class="text-center mb-4">
-        <div class="mark d-inline-flex align-items-center justify-content-center mx-auto mb-2" style="width: 46px; height: 46px; border-radius: 12px; background: var(--brand, #9bbe92); color: var(--brand-ink, #EAF3EF); font-weight: 700; font-size: 22px;">
+        <div class="mark d-inline-flex align-items-center justify-content-center mx-auto mb-2" style="width: 46px; height: 46px; border-radius: 12px; background: var(--brand, #167A55); color: var(--brand-ink, #E7F3EC); font-weight: 700; font-size: 22px;">
           U
         </div>
         <h1 class="h4 fw-bold mb-1" style="color: var(--ink, #1B2430);">UsahaKu</h1>
@@ -59,7 +59,7 @@
         <button 
           type="submit" 
           class="btn btn-primary w-100 py-2 mt-2 fw-medium text-white d-flex align-items-center justify-content-center gap-2" 
-          style="background: var(--brand, #9bbe92); border-color: var(--brand, #9bbe92); border-radius: 8px;"
+          style="background: var(--brand, #167A55); border-color: var(--brand, #167A55); border-radius: 8px;"
           :disabled="isSubmitting"
         >
           <span v-if="isSubmitting" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
@@ -67,32 +67,12 @@
         </button>
       </form>
 
-      <!-- Pre-registered accounts helper / quick select -->
-      <div class="mt-3 pt-3 border-top" v-show="false">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <small class="text-secondary fw-semibold">Pilih Cepat Akun:</small>
-          <small class="badge bg-light text-secondary border">Password: adm1nusahaku</small>
-        </div>
-        <div class="d-flex flex-column gap-1">
-          <button 
-            v-for="(info, mail) in registeredUsers" 
-            :key="mail"
-            type="button" 
-            class="btn btn-sm btn-light border text-start d-flex justify-content-between align-items-center py-1 px-2"
-            @click="quickSelectUser(mail)"
-          >
-            <span class="small text-truncate" style="max-width: 220px;">{{ info.name }}</span>
-            <span class="badge text-bg-secondary" style="font-size: 10px;">Pilih</span>
-          </button>
-        </div>
-      </div>
-
     </div>
   </div>
 </template>
 
 <script>
-import { loginUser, REGISTERED_USERS, DEFAULT_PASSWORD } from '@/services/auth';
+import { loginUser } from '@/services/auth';
 import { showToast } from '@/services/notification';
 
 export default {
@@ -102,15 +82,10 @@ export default {
       email: '',
       password: '',
       showPassword: false,
-      isSubmitting: false,
-      registeredUsers: REGISTERED_USERS
+      isSubmitting: false
     };
   },
   methods: {
-    quickSelectUser(selectedEmail) {
-      this.email = selectedEmail;
-      this.password = DEFAULT_PASSWORD;
-    },
     async handleLogin() {
       if (!this.email || !this.password) {
         showToast('Email dan password wajib diisi.', 'warning');
@@ -126,7 +101,7 @@ export default {
         return;
       }
 
-      showToast(`Selamat datang kembali, ${result.user.name}!`, 'success');
+      showToast(`Selamat datang kembali, ${result.user.name} (${(result.user.role || 'admin').toUpperCase()})!`, 'success');
       this.$router.push('/');
     }
   }
@@ -135,9 +110,13 @@ export default {
 
 <style scoped>
 .login-wrapper {
+  width: 100%;
+  flex: 1 1 auto;
   background: var(--bg, #F7F5F1);
 }
 .login-card {
+  flex: 0 1 440px;
+  margin: auto;
   border-color: var(--line, #E7E3DB) !important;
 }
 </style>

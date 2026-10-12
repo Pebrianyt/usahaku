@@ -7,6 +7,16 @@
         <div class="name">UsahaKu</div>
       </div>
       <div class="d-flex align-items-center gap-2">
+        <span 
+          class="badge text-uppercase" 
+          :style="{ 
+            background: isOwner ? '#FCEFDD' : 'var(--brand-ink)', 
+            color: isOwner ? '#B4700F' : 'var(--brand-text)',
+            fontSize: '10px'
+          }"
+        >
+          {{ userRole }}
+        </span>
         <RouterLink 
           to="/profile" 
           class="btn btn-sm d-flex align-items-center justify-content-center p-1"
@@ -14,7 +24,12 @@
         >
           <div 
             class="d-flex align-items-center justify-content-center text-white fw-bold rounded-circle"
-            style="width: 32px; height: 32px; background: var(--brand, #9bbe92); font-size: 13px;"
+            :style="{ 
+              width: '32px', 
+              height: '32px', 
+              background: isOwner ? '#B4700F' : 'var(--brand, #167A55)', 
+              fontSize: '13px' 
+            }"
           >
             {{ userInitials }}
           </div>
@@ -60,6 +75,7 @@
         </div>
 
         <ul class="navMenu">
+          <!-- 1. Dashboard (All roles) -->
           <li>
             <RouterLink to="/" active-class="active" @click="isMobileMenuOpen = false">
               <svg class="navIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -71,7 +87,9 @@
               <span>Dashboard</span>
             </RouterLink>
           </li>
-          <li>
+
+          <!-- 2. Master Data (Owner Only) -->
+          <li v-if="isOwner">
             <RouterLink to="/master-data" active-class="active" @click="isMobileMenuOpen = false">
               <svg class="navIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <rect x="3.5" y="4.5" width="17" height="15" rx="2"/>
@@ -80,6 +98,8 @@
               <span>Master Data</span>
             </RouterLink>
           </li>
+
+          <!-- 3. Persediaan (All roles) -->
           <li>
             <RouterLink to="/persediaan" active-class="active" @click="isMobileMenuOpen = false">
               <svg class="navIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -89,6 +109,8 @@
               <span>Persediaan</span>
             </RouterLink>
           </li>
+
+          <!-- 4. Daftar Pesanan (All roles) -->
           <li>
             <RouterLink to="/daftar-pesanan" active-class="active" @click="isMobileMenuOpen = false">
               <svg class="navIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -100,6 +122,8 @@
               <span>Daftar Pesanan</span>
             </RouterLink>
           </li>
+
+          <!-- 5. Arus Kas (All roles) -->
           <li>
             <RouterLink to="/arus-kas" active-class="active" @click="isMobileMenuOpen = false">
               <svg class="navIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -109,7 +133,9 @@
               <span>Arus Kas</span>
             </RouterLink>
           </li>
-          <li>
+
+          <!-- 6. Laba Rugi (Owner Only) -->
+          <li v-if="isOwner">
             <RouterLink to="/laba-rugi" active-class="active" @click="isMobileMenuOpen = false">
               <svg class="navIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M4 20V4M4 20h17"/>
@@ -120,6 +146,21 @@
               <span>Laba Rugi</span>
             </RouterLink>
           </li>
+
+          <!-- 7. Kelola User (Owner Only) -->
+          <li v-if="isOwner">
+            <RouterLink to="/users" active-class="active" @click="isMobileMenuOpen = false">
+              <svg class="navIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+              <span>Kelola User</span>
+            </RouterLink>
+          </li>
+
+          <!-- 8. Profil (All roles) -->
           <li>
             <RouterLink to="/profile" active-class="active" @click="isMobileMenuOpen = false">
               <svg class="navIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -142,16 +183,36 @@
         >
           <div 
             class="d-flex align-items-center justify-content-center text-white fw-bold rounded-circle flex-shrink-0"
-            style="width: 34px; height: 34px; background: var(--brand, #9bbe92); font-size: 13px;"
+            :style="{ 
+              width: '34px', 
+              height: '34px', 
+              background: isOwner ? '#B4700F' : 'var(--brand, #167A55)', 
+              fontSize: '13px' 
+            }"
           >
             {{ userInitials }}
           </div>
           <div class="overflow-hidden">
-            <div class="small fw-bold text-truncate" style="color: var(--ink, #1B2430);">
-              {{ userName }}
+            <div class="d-flex align-items-center gap-1">
+              <span class="small fw-bold text-truncate" style="color: var(--ink, #1B2430);">
+                {{ userName }}
+              </span>
             </div>
-            <div class="text-secondary small text-truncate" style="font-size: 11px;">
-              {{ userEmail }}
+            <div class="d-flex align-items-center gap-1">
+              <span 
+                class="badge text-uppercase" 
+                :style="{ 
+                  background: isOwner ? '#FCEFDD' : 'var(--brand-ink)', 
+                  color: isOwner ? '#B4700F' : 'var(--brand-text)',
+                  fontSize: '9px',
+                  padding: '2px 6px'
+                }"
+              >
+                {{ userRole }}
+              </span>
+              <span class="text-secondary small text-truncate" style="font-size: 10.5px;">
+                {{ userEmail }}
+              </span>
             </div>
           </div>
         </RouterLink>
@@ -188,6 +249,12 @@ export default {
   computed: {
     currentUser() {
       return authState.user;
+    },
+    isOwner() {
+      return authState.user?.role === 'owner';
+    },
+    userRole() {
+      return authState.user?.role === 'owner' ? 'Owner' : 'Admin';
     },
     userInitials() {
       return authState.user?.initials || 'U';

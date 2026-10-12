@@ -1,8 +1,11 @@
 /* Token warna dan fondasi tampilan bersama untuk semua halaman HTML. */
 :root{
   --bg:#F7F5F1; --panel:#FFFFFF; --ink:#1B2430; --sub:#6B7480;
-  --line:#E7E3DB; --brand:#9bbe92; --brand-ink:#EAF3EF;
+  --line:#E7E3DB; --brand:#167A55; --brand-hover:#105F42;
+  --brand-ink:#E7F3EC; --brand-text:#145C43;
   --accent:#D98E2B; --danger:#C25B4A; --r:14px;
+  --bs-primary:#167A55; --bs-primary-rgb:22,122,85;
+  --bs-success:#167A55; --bs-success-rgb:22,122,85;
 }
 *{box-sizing:border-box;}
 body{
@@ -26,29 +29,30 @@ nav.topnav a{
   display:flex; align-items:center; padding:10px 12px; border-radius:10px;
   color:var(--sub); font-size:14.5px; text-decoration:none; font-weight:600;
 }
-nav.topnav a.active{background:var(--brand-ink); color:var(--brand);}
+nav.topnav a.active{background:var(--brand-ink); color:var(--brand-text);}
 nav.topnav a:not(.active):hover{background:var(--line);}
 
 /* Tata letak landmark konten utama pada seluruh halaman fitur. */
-main{flex:0 1 auto; width:calc(100% - 220px); min-width:0; margin-left:220px; padding:28px 32px 60px; max-width:1080px;}
+main{flex:0 1 auto; width:calc(100% - 220px); min-width:0; margin-left:220px; padding:28px 32px 60px;}
+.page-container{width:calc(100% - 220px);max-width:calc(100% - 220px);min-width:0;margin-left:220px;}
 header.pagehead{margin-bottom:22px;}
 header.pagehead h1{font-size:22px; margin:0 0 4px;}
 header.pagehead p{margin:0; color:var(--sub); font-size:14px;}
 #status{font-size:12.5px; color:var(--sub); margin:0 0 16px;}
 
 .cards{display:flex; gap:14px; margin-bottom:22px; flex-wrap:wrap;}
-.card{flex:1; min-width:150px; background:var(--panel); border:1px solid var(--line); border-radius:var(--r); padding:16px 18px;}
-.card .label{font-size:12.5px; color:var(--sub); margin-bottom:6px;}
-.card .value{font-size:21px; font-weight:700;}
+.cards>.card{flex:1 1 150px; min-width:150px; background:var(--panel); border:1px solid var(--line); border-radius:var(--r); padding:16px 18px;}
+.cards>.card .label{font-size:12.5px; color:var(--sub); margin-bottom:6px;}
+.cards>.card .value{font-size:21px; font-weight:700;}
 
 /* Gaya bersama untuk form, input, tombol, dan tabel pada halaman fitur. */
 form{
   background:var(--panel); border:1px solid var(--line); border-radius:var(--r);
   padding:16px; display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; align-items:center;
 }
-input, select{
+input:not([type="radio"]):not([type="checkbox"]), select{
   padding:9px 10px; border:1px solid var(--line); border-radius:8px; font-size:13.5px;
-  flex:1; min-width:130px; background:var(--bg);
+  flex:1; background:var(--bg);
 }
 .inputRupiah{
   position:relative; display:flex; align-items:center;
@@ -73,7 +77,7 @@ button[type="submit"]:hover{background:#F0EEE9;}
 .fieldGroup>label{display:block;color:var(--sub);font-size:12.5px;font-weight:600;line-height:1.35;}
 .fieldGroup>input,.fieldGroup>select{width:100%;min-width:0;flex:1;}
 .fieldGroup .inputRupiah{width:100%;min-width:0;flex:1;}
-.fieldGroup .inputRupiah input{width:100%;min-width:0;}
+.fieldGroup .inputRupiah input{width:100%;min-width:0;padding-left:32px;}
 
 table{width:100%; border-collapse:collapse; background:var(--panel); border:1px solid var(--line); border-radius:var(--r); overflow:hidden;}
 th, td{text-align:left; padding:12px 16px; font-size:13.5px;}
@@ -105,15 +109,16 @@ td .inputRupiah .prefix{left:8px;}
   nav.topnav a{white-space:nowrap;} */
   /* Kurangi jarak konten utama pada layar kecil. */
   main{margin-left:0; width:100%; max-width:none; padding:20px 16px 40px;}
+  .page-container{width:100%;max-width:100%;margin-left:0;}
   /* Susun bidang form secara vertikal pada layar kecil. */
   form{flex-direction:column; align-items:stretch; gap:12px;}
   form .fieldGroup{flex:0 0 auto; width:100%; min-width:0;}
   form .fieldGroup>input,
   form .fieldGroup>select,
-  form .fieldGroup .inputRupiah{flex:0 0 42px; height:42px; min-height:42px;}
-  form .fieldGroup .inputRupiah input{flex:0 0 42px; height:42px;}
+  form .fieldGroup .inputRupiah{height:42px; min-height:42px;}
+  form .fieldGroup .inputRupiah input{height:42px; padding-left:32px;}
   form button[type="submit"]{align-self:flex-start;}
-  table{display:block; width:100%; min-width:640px; max-width:100%; overflow-x:auto;}
+  table{display:block; width:100%; min-width:0; max-width:100%; overflow-x:auto;}
 }
 
 /* tombol berbentuk ikon bulat/kotak, tanpa teks — monokrom hitam putih */
@@ -144,6 +149,20 @@ button[type="submit"].btnIcon.btnTambah::after{width:3px; height:16px;}
 .btnIcon.btnEdit{color:#1B2430;}
 .btnIcon.btnHapus{color:#1B2430;}
 
+/* Aksen utama memakai hijau zamrud dengan kontras yang jelas. */
+.btn-success,
+.btn-primary{
+  --bs-btn-bg:var(--brand);
+  --bs-btn-border-color:var(--brand);
+  --bs-btn-hover-bg:var(--brand-hover);
+  --bs-btn-hover-border-color:var(--brand-hover);
+  --bs-btn-active-bg:var(--brand-hover);
+  --bs-btn-active-border-color:var(--brand-hover);
+  --bs-btn-disabled-bg:var(--brand);
+  --bs-btn-disabled-border-color:var(--brand);
+  --bs-btn-focus-shadow-rgb:22,122,85;
+}
+
 /* Khusus daftar_pesanan.html: pilihan massal dan tabel pesanan. */
 .bulkbar{display:flex; align-items:center; gap:10px; margin-bottom:12px;}
 .bulkbar span{font-size:12.5px; color:var(--sub);}
@@ -167,7 +186,7 @@ button[type="submit"].btnIcon:hover{
 }
 
 /* Tabel pesanan dibuat rapat agar muat pada lebar halaman. */
-.pesananTableScroll{width:100%;overflow-x:auto;border-radius:var(--r);}
+.pesananTableScroll{width:100%;min-width:0;overflow-x:auto;border-radius:var(--r);}
 .tblPesanan{width:100%;min-width:940px;table-layout:fixed;}
 .tblPesanan th,.tblPesanan td{padding:9px 7px;font-size:12px;overflow-wrap:anywhere;}
 .tblPesanan th{font-size:11.5px;line-height:1.25;}
@@ -378,7 +397,7 @@ button[type="submit"].btnIcon:hover{
   }
 }
 main>h2{margin:24px 0 10px;font-size:18px;}
-.tableScroll{width:100%;overflow-x:auto;margin-bottom:22px;}
+.tableScroll{width:100%;min-width:0;overflow-x:auto;margin-bottom:22px;}
 .tableScroll table{min-width:850px;}
 .stokRiwayatTable th:first-child,.stokRiwayatTable td:first-child{min-width:115px;white-space:nowrap;}
 /* Filter periode dipakai laba_rugi.html dan index.html. */
@@ -480,5 +499,5 @@ nav.topnav a span{line-height:1.3;}
 
 
 /* Gaya judul metrik semantik yang memakai elemen h2 di dalam kartu. */
-.card .label{margin:0 0 6px;font-size:12.5px;font-weight:600;}
+.cards>.card .label{margin:0 0 6px;font-size:12.5px;font-weight:600;}
 

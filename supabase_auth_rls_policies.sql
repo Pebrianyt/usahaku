@@ -1,5 +1,5 @@
 -- ==============================================================================
--- USAHAKU - AUTHENTICATION, USERS SEEDING & ROW LEVEL SECURITY (RLS)
+-- USAHAKU - AUTHENTICATION, ROLES (OWNER & ADMIN), USERS & ROW LEVEL SECURITY
 -- ==============================================================================
 -- Jalankan seluruh script ini pada SQL Editor di Supabase Dashboard:
 -- https://supabase.com/dashboard/project/_/sql
@@ -11,14 +11,22 @@
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- ------------------------------------------------------------------------------
--- 2. SEED DAFTAR USER KE AUTH.USERS SUPABASE
--- Default Password: "adm1nusahaku"
--- Email terdaftar:
---   1. kholan.childs404@gmail.com (KHOLAN MUSTAQIM)
---   2. kartikaniadewi@gmail.com   (NIA DEWI KARTIKA)
---   3. muhammadridhaby@gmail.com  (M RIDHABY)
---   4. pebrianyrstn@gmail.com     (PEBRIAN YURISTIANA)
---   5. siswanto7612@gmail.com     (SISWANTO)
+-- 2. TABEL DAFTAR PENGGUNA & PERAN (APP_USERS)
+-- Role: 'owner' (Akses Penuh Semua Menu), 'admin' (Akses Menu Terbatas)
+-- ------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.app_users (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  email text UNIQUE NOT NULL,
+  nama text NOT NULL,
+  role text NOT NULL DEFAULT 'admin' CHECK (role IN ('owner', 'admin')),
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
+
+-- ------------------------------------------------------------------------------
+-- 3. SEED USER OWNER & ADMIN KE APP_USERS & AUTH.USERS
+-- Owner Awal: yangpunya@gmail.com (Password: "ownerusahaku")
+-- Admin: kholan.childs404@gmail.com, kartikaniadewi@gmail.com, dll (Password: "adm1nusahaku")
 -- ------------------------------------------------------------------------------
 DO $$
 DECLARE
@@ -26,17 +34,28 @@ DECLARE
   v_user_id uuid;
   v_encrypted_pw text;
 BEGIN
-  -- Generate bcrypt hash untuk password "adm1nusahaku"
-  v_encrypted_pw := crypt('adm1nusahaku', gen_salt('bf', 10));
-
+  -- Data pengguna awal
   FOR v_users IN 
-    SELECT 'kholan.childs404@gmail.com' as email, 'KHOLAN MUSTAQIM' as full_name
-    UNION ALL SELECT 'kartikaniadewi@gmail.com', 'NIA DEWI KARTIKA'
-    UNION ALL SELECT 'muhammadridhaby@gmail.com', 'M RIDHABY'
-    UNION ALL SELECT 'pebrianyrstn@gmail.com', 'PEBRIAN YURISTIANA'
-    UNION ALL SELECT 'siswanto7612@gmail.com', 'SISWANTO'
+    SELECT 'yangpunya@gmail.com' as email, 'PEMILIK USAHAKU' as full_name, 'owner' as role, 'ownerusahaku' as password
+    UNION ALL SELECT 'kholan.childs404@gmail.com', 'KHOLAN MUSTAQIM', 'admin', 'adm1nusahaku'
+    UNION ALL SELECT 'kartikaniadewi@gmail.com', 'NIA DEWI KARTIKA', 'admin', 'adm1nusahaku'
+    UNION ALL SELECT 'muhammadridhaby@gmail.com', 'M RIDHABY', 'admin', 'adm1nusahaku'
+    UNION ALL SELECT 'pebrianyrstn@gmail.com', 'PEBRIAN YURISTIANA', 'admin', 'adm1nusahaku'
+    UNION ALL SELECT 'siswanto7612@gmail.com', 'SISWANTO', 'admin', 'adm1nusahaku'
   LOOP
-    -- Periksa apakah user sudah ada
+    -- 1. Upsert ke tabel public.app_users
+    INSERT INTO public.app_users (email, nama, role)
+    VALUES (v_users.email, v_users.full_name, v_users.role)
+    ON CONFLICT (email) 
+    DO UPDATE SET 
+      nama = EXCLUDED.nama,
+      role = EXCLUDED.role,
+      updated_at = now();
+
+    -- 2. Generate bcrypt hash untuk kata sandi
+    v_encrypted_pw := crypt(v_users.password, gen_salt('bf', 10));
+
+    -- 3. Upsert ke auth.users Supabase
     SELECT id INTO v_user_id FROM auth.users WHERE email = v_users.email;
 
     IF v_user_id IS NULL THEN
@@ -71,7 +90,7 @@ BEGIN
         now(),
         now(),
         '{"provider":"email","providers":["email"]}',
-        jsonb_build_object('full_name', v_users.full_name),
+        jsonb_build_object('full_name', v_users.full_name, 'role', v_users.role),
         now(),
         now(),
         '',
@@ -99,11 +118,11 @@ BEGIN
         now()
       );
     ELSE
-      -- Jika sudah ada, perbarui kata sandi dan metadata nama jika perlu
+      -- Jika sudah ada, perbarui kata sandi dan metadata peran
       UPDATE auth.users
       SET encrypted_password = v_encrypted_pw,
           email_confirmed_at = COALESCE(email_confirmed_at, now()),
-          raw_user_meta_data = jsonb_build_object('full_name', v_users.full_name),
+          raw_user_meta_data = jsonb_build_object('full_name', v_users.full_name, 'role', v_users.role),
           updated_at = now()
       WHERE id = v_user_id;
     END IF;
@@ -111,89 +130,83 @@ BEGIN
 END $$;
 
 -- ------------------------------------------------------------------------------
--- 3. AKTIFKAN ROW LEVEL SECURITY (RLS) DI SELURUH TABEL DATA
+-- 4. AKTIFKAN ROW LEVEL SECURITY (RLS) DI SELURUH TABEL DATA
 -- ------------------------------------------------------------------------------
-ALTER TABLE IF EXISTS produk ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS pesanan ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS transaksi_stok ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS alokasi_stok_fifo ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS transaksi_kas ENABLE ROW LEVEL SECURITY;
-
--- ------------------------------------------------------------------------------
--- 4. HAPUS SEMUA KEBIJAKAN LAMA (TERMASUK AKSES ANONIM)
--- ------------------------------------------------------------------------------
-DROP POLICY IF EXISTS "Akses anonim penuh produk" ON produk;
-DROP POLICY IF EXISTS "Akses penuh produk" ON produk;
-DROP POLICY IF EXISTS "Akses autentikasi produk" ON produk;
-
-DROP POLICY IF EXISTS "Akses anonim penuh pesanan" ON pesanan;
-DROP POLICY IF EXISTS "Akses penuh pesanan" ON pesanan;
-DROP POLICY IF EXISTS "Akses autentikasi pesanan" ON pesanan;
-
-DROP POLICY IF EXISTS "Akses anonim penuh transaksi_stok" ON transaksi_stok;
-DROP POLICY IF EXISTS "Akses penuh transaksi_stok" ON transaksi_stok;
-DROP POLICY IF EXISTS "Akses autentikasi transaksi_stok" ON transaksi_stok;
-
-DROP POLICY IF EXISTS "Akses anonim penuh alokasi_stok_fifo" ON alokasi_stok_fifo;
-DROP POLICY IF EXISTS "Akses penuh alokasi_stok_fifo" ON alokasi_stok_fifo;
-DROP POLICY IF EXISTS "Akses autentikasi alokasi_stok_fifo" ON alokasi_stok_fifo;
-
-DROP POLICY IF EXISTS "Akses anonim penuh transaksi_kas" ON transaksi_kas;
-DROP POLICY IF EXISTS "Akses penuh transaksi_kas" ON transaksi_kas;
-DROP POLICY IF EXISTS "Akses autentikasi transaksi_kas" ON transaksi_kas;
+ALTER TABLE IF EXISTS public.app_users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.produk ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.pesanan ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.transaksi_stok ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.alokasi_stok_fifo ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS public.transaksi_kas ENABLE ROW LEVEL SECURITY;
 
 -- ------------------------------------------------------------------------------
--- 5. CABUT AKSES ANONIM & BERIKAN HANYA KEPADA ROLE AUTHENTICATED
+-- 5. HAPUS SEMUA KEBIJAKAN LAMA
 -- ------------------------------------------------------------------------------
--- Cabut akses dari anonim (publik yang belum login)
+DROP POLICY IF EXISTS "Akses autentikasi app_users" ON public.app_users;
+DROP POLICY IF EXISTS "Akses autentikasi produk" ON public.produk;
+DROP POLICY IF EXISTS "Akses autentikasi pesanan" ON public.pesanan;
+DROP POLICY IF EXISTS "Akses autentikasi transaksi_stok" ON public.transaksi_stok;
+DROP POLICY IF EXISTS "Akses autentikasi alokasi_stok_fifo" ON public.alokasi_stok_fifo;
+DROP POLICY IF EXISTS "Akses autentikasi transaksi_kas" ON public.transaksi_kas;
+
+-- ------------------------------------------------------------------------------
+-- 6. CABUT AKSES ANONIM (PUBLIK) & BERIKAN HANYA KEPADA ROLE AUTHENTICATED
+-- ------------------------------------------------------------------------------
 REVOKE ALL ON ALL TABLES IN SCHEMA public FROM anon;
 REVOKE ALL ON ALL SEQUENCES IN SCHEMA public FROM anon;
 
--- Berikan izin akses penuh kepada role authenticated (pengguna yang sudah login)
 GRANT USAGE ON SCHEMA public TO authenticated;
 GRANT ALL ON ALL TABLES IN SCHEMA public TO authenticated;
 GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO authenticated;
 GRANT ALL ON ALL ROUTINES IN SCHEMA public TO authenticated;
 
 -- ------------------------------------------------------------------------------
--- 6. BUAT POLICY RLS KETAT: HANYA USER YANG SUDAH LOGIN DAPAT MENGAKSES
+-- 7. BUAT POLICY RLS KETAT: HANYA USER YANG SUDAH LOGIN DAPAT MENGAKSES
 -- ------------------------------------------------------------------------------
 
--- Tabel Produk: Hanya authenticated
+-- Tabel app_users
+CREATE POLICY "Akses autentikasi app_users"
+ON public.app_users
+FOR ALL
+TO authenticated
+USING (auth.role() = 'authenticated')
+WITH CHECK (auth.role() = 'authenticated');
+
+-- Tabel produk
 CREATE POLICY "Akses autentikasi produk"
-ON produk
+ON public.produk
 FOR ALL
 TO authenticated
 USING (auth.role() = 'authenticated')
 WITH CHECK (auth.role() = 'authenticated');
 
--- Tabel Pesanan: Hanya authenticated
+-- Tabel pesanan
 CREATE POLICY "Akses autentikasi pesanan"
-ON pesanan
+ON public.pesanan
 FOR ALL
 TO authenticated
 USING (auth.role() = 'authenticated')
 WITH CHECK (auth.role() = 'authenticated');
 
--- Tabel Transaksi Stok: Hanya authenticated
+-- Tabel transaksi_stok
 CREATE POLICY "Akses autentikasi transaksi_stok"
-ON transaksi_stok
+ON public.transaksi_stok
 FOR ALL
 TO authenticated
 USING (auth.role() = 'authenticated')
 WITH CHECK (auth.role() = 'authenticated');
 
--- Tabel Alokasi Stok FIFO: Hanya authenticated
+-- Tabel alokasi_stok_fifo
 CREATE POLICY "Akses autentikasi alokasi_stok_fifo"
-ON alokasi_stok_fifo
+ON public.alokasi_stok_fifo
 FOR ALL
 TO authenticated
 USING (auth.role() = 'authenticated')
 WITH CHECK (auth.role() = 'authenticated');
 
--- Tabel Transaksi Kas: Hanya authenticated
+-- Tabel transaksi_kas
 CREATE POLICY "Akses autentikasi transaksi_kas"
-ON transaksi_kas
+ON public.transaksi_kas
 FOR ALL
 TO authenticated
 USING (auth.role() = 'authenticated')
