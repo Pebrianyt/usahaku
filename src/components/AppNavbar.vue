@@ -1,12 +1,17 @@
 <template>
   <div>
-    <!-- Mobile Header (Visible on screens < 992px) -->
+    <!-- ============================================
+         MOBILE HEADER - Tampil pada layar < 992px
+         ============================================ -->
     <header class="d-lg-none mobile-topbar d-flex align-items-center justify-content-between px-3 py-2 border-bottom bg-white sticky-top">
       <div class="brand d-flex align-items-center gap-2">
+        <!-- Logo brand -->
         <div class="mark">U</div>
+        <!-- Nama aplikasi -->
         <div class="name">UsahaKu</div>
       </div>
       <div class="d-flex align-items-center gap-2">
+        <!-- Badge role user - warna berbeda untuk owner vs admin -->
         <span 
           class="badge text-uppercase" 
           :style="{ 
@@ -17,11 +22,13 @@
         >
           {{ userRole }}
         </span>
+        <!-- Link ke profile page -->
         <RouterLink 
           to="/profile" 
           class="btn btn-sm d-flex align-items-center justify-content-center p-1"
           title="Profil Pengguna"
         >
+          <!-- Avatar inisial user -->
           <div 
             class="d-flex align-items-center justify-content-center text-white fw-bold rounded-circle"
             :style="{ 
@@ -34,6 +41,7 @@
             {{ userInitials }}
           </div>
         </RouterLink>
+        <!-- Tombol hamburger menu untuk buka mobile navigation -->
         <button 
           class="btn btn-sm btn-outline-secondary d-flex align-items-center justify-content-center p-2" 
           type="button" 
@@ -47,7 +55,10 @@
       </div>
     </header>
 
-    <!-- Backdrop for mobile drawer -->
+    <!-- ============================================
+         BACKDROP - Layer gelap di belakang mobile drawer
+         Tampil hanya saat mobile menu terbuka
+         ============================================ -->
     <div 
       v-if="isMobileMenuOpen" 
       class="mobile-backdrop d-lg-none position-fixed top-0 start-0 w-100 h-100" 
@@ -55,18 +66,25 @@
       @click="isMobileMenuOpen = false"
     ></div>
 
-    <!-- Main Navigation Sidebar (Desktop + Mobile Drawer) -->
+    <!-- ============================================
+         MAIN NAVIGATION SIDEBAR
+         - Desktop: selalu visible di samping
+         - Mobile: slide-in drawer dari kiri
+         ============================================ -->
     <nav 
       class="topnav d-flex flex-column justify-content-between" 
       :class="{ 'mobile-open': isMobileMenuOpen }" 
       aria-label="Navigasi utama"
     >
+      <!-- Bagian atas: Brand & Menu -->
       <div>
+        <!-- Header sidebar dengan brand dan tombol close (mobile) -->
         <div class="d-flex align-items-center justify-content-between pe-1 mb-2">
           <div class="brand">
             <div class="mark">U</div>
             <div class="name">UsahaKu</div>
           </div>
+          <!-- Tombol close untuk mobile - menyembunyikan drawer -->
           <button 
             class="btn-close d-lg-none me-2" 
             aria-label="Tutup navigasi" 
@@ -74,8 +92,13 @@
           ></button>
         </div>
 
+        <!-- ============================================
+             NAVIGATION MENU
+             Setiap item menampilkan icon + label
+             dan menutup mobile menu saat diklik
+             ============================================ -->
         <ul class="navMenu">
-          <!-- 1. Dashboard (All roles) -->
+          <!-- 1. Dashboard - dapat diakses semua role -->
           <li>
             <RouterLink to="/" active-class="active" @click="isMobileMenuOpen = false">
               <svg class="navIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -88,7 +111,7 @@
             </RouterLink>
           </li>
 
-          <!-- 2. Master Data (Owner Only) -->
+          <!-- 2. Master Data - hanya Owner -->
           <li v-if="isOwner">
             <RouterLink to="/master-data" active-class="active" @click="isMobileMenuOpen = false">
               <svg class="navIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -99,7 +122,7 @@
             </RouterLink>
           </li>
 
-          <!-- 3. Persediaan (All roles) -->
+          <!-- 3. Persediaan - dapat diakses semua role -->
           <li>
             <RouterLink to="/persediaan" active-class="active" @click="isMobileMenuOpen = false">
               <svg class="navIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -110,7 +133,7 @@
             </RouterLink>
           </li>
 
-          <!-- 4. Daftar Pesanan (All roles) -->
+          <!-- 4. Daftar Pesanan - dapat diakses semua role -->
           <li>
             <RouterLink to="/daftar-pesanan" active-class="active" @click="isMobileMenuOpen = false">
               <svg class="navIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -123,7 +146,7 @@
             </RouterLink>
           </li>
 
-          <!-- 5. Arus Kas (All roles) -->
+          <!-- 5. Arus Kas - dapat diakses semua role -->
           <li>
             <RouterLink to="/arus-kas" active-class="active" @click="isMobileMenuOpen = false">
               <svg class="navIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -134,7 +157,7 @@
             </RouterLink>
           </li>
 
-          <!-- 6. Laba Rugi (Owner Only) -->
+          <!-- 6. Laba Rugi - hanya Owner -->
           <li v-if="isOwner">
             <RouterLink to="/laba-rugi" active-class="active" @click="isMobileMenuOpen = false">
               <svg class="navIcon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -147,7 +170,7 @@
             </RouterLink>
           </li>
 
-          <!-- 7. Kelola User (Owner Only) -->
+          <!-- 7. Kelola User - hanya Owner -->
           <li v-if="isOwner">
             <RouterLink to="/users" active-class="active" @click="isMobileMenuOpen = false">
               <svg class="navIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -160,7 +183,7 @@
             </RouterLink>
           </li>
 
-          <!-- 8. Profil (All roles) -->
+          <!-- 8. Profil - dapat diakses semua role -->
           <li>
             <RouterLink to="/profile" active-class="active" @click="isMobileMenuOpen = false">
               <svg class="navIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -173,14 +196,19 @@
         </ul>
       </div>
 
-      <!-- Bottom User Profile & Logout Area -->
+      <!-- ============================================
+           BOTTOM SECTION - User Profile & Logout
+           Menampilkan info user dan tombol logout
+           ============================================ -->
       <div class="sidebar-user border-top pt-3 mt-4">
+        <!-- Link ke profile dengan info user -->
         <RouterLink 
           to="/profile" 
           class="d-flex align-items-center gap-2 p-2 rounded text-decoration-none text-dark"
           style="background: var(--bg, #F7F5F1);"
           @click="isMobileMenuOpen = false"
         >
+          <!-- Avatar inisial user -->
           <div 
             class="d-flex align-items-center justify-content-center text-white fw-bold rounded-circle flex-shrink-0"
             :style="{ 
@@ -192,6 +220,7 @@
           >
             {{ userInitials }}
           </div>
+          <!-- Info user: nama, role, email -->
           <div class="overflow-hidden">
             <div class="d-flex align-items-center gap-1">
               <span class="small fw-bold text-truncate" style="color: var(--ink, #1B2430);">
@@ -199,6 +228,7 @@
               </span>
             </div>
             <div class="d-flex align-items-center gap-1">
+              <!-- Badge role dengan warna khusus owner -->
               <span 
                 class="badge text-uppercase" 
                 :style="{ 
@@ -210,6 +240,7 @@
               >
                 {{ userRole }}
               </span>
+              <!-- Email user (opsional) -->
               <span class="text-secondary small text-truncate" style="font-size: 10.5px;">
                 {{ userEmail }}
               </span>
@@ -217,6 +248,7 @@
           </div>
         </RouterLink>
 
+        <!-- Tombol logout -->
         <button 
           type="button" 
           class="btn btn-sm btn-light border w-100 mt-2 d-flex align-items-center justify-content-center gap-1 text-secondary"
@@ -236,6 +268,12 @@
 </template>
 
 <script>
+/**
+ * Komponen AppNavbar
+ * Navigation bar untuk desktop dan mobile.
+ * Menampilkan menu navigasi berdasarkan role user (Owner/Admin).
+ * Memanggil auth service untuk data user dan notification service untuk konfirmasi logout.
+ */
 import { authState, logoutUser } from '@/services/auth';
 import { confirmAction, showToast } from '@/services/notification';
 
@@ -243,42 +281,87 @@ export default {
   name: 'AppNavbar',
   data() {
     return {
+      /**
+       * State untuk mengontrol opening mobile menu drawer.
+       * @type {boolean}
+       */
       isMobileMenuOpen: false
     };
   },
   computed: {
+    /**
+     * Mengambil data user dari auth service.
+     * @returns {Object|null} Objek user atau null jika belum login
+     */
     currentUser() {
       return authState.user;
     },
+    /**
+     * Memeriksa apakah user memiliki role Owner.
+     * Digunakan untuk mengontrol visibility menu yang hanya untuk owner.
+     * @returns {boolean} True jika user adalah owner
+     */
     isOwner() {
       return authState.user?.role === 'owner';
     },
+    /**
+     * Mendapatkan label role user untuk ditampilkan di UI.
+     * @returns {string} 'Owner' atau 'Admin'
+     */
     userRole() {
       return authState.user?.role === 'owner' ? 'Owner' : 'Admin';
     },
+    /**
+     * Mendapatkan inisial nama user untuk avatar.
+     * @returns {string} Inisial (maks 2 karakter) atau 'U' sebagai default
+     */
     userInitials() {
       return authState.user?.initials || 'U';
     },
+    /**
+     * Mendapatkan nama lengkap user.
+     * @returns {string} Nama user atau 'Pengguna' sebagai default
+     */
     userName() {
       return authState.user?.name || 'Pengguna';
     },
+    /**
+     * Mendapatkan email user.
+     * @returns {string} Email user atau string kosong jika tidak ada
+     */
     userEmail() {
       return authState.user?.email || '';
     }
   },
   methods: {
+    /**
+     * Menangani aksi logout user.
+     * 1. Tutup mobile menu
+     * 2. Tampilkan modal konfirmasi
+     * 3. Jika dikonfirm, lakukan logout dan tampilkan toast
+     * 4. Redirect ke halaman login
+     */
     async handleLogout() {
+      // Tutup mobile menu saat tombol diklik
       this.isMobileMenuOpen = false;
+      
+      // Tampilkan modal konfirmasi keluar
       const confirmed = await confirmAction('Apakah Anda yakin ingin keluar dari UsahaKu?', {
         title: 'Konfirmasi Keluar',
         confirmText: 'Ya, Keluar',
         confirmVariant: 'danger'
       });
 
+      // Jika user membatalkan, hentikan proses
       if (!confirmed) return;
 
+      // Lakukan logout
       await logoutUser();
+      
+      // Tampilkan notifikasi sukses
       showToast('Anda telah berhasil keluar.', 'info');
+      
+      // Redirect ke halaman login
       this.$router.push('/login');
     }
   }
@@ -286,6 +369,10 @@ export default {
 </script>
 
 <style scoped>
+/**
+ * Styling khusus untuk responsive behavior.
+ * Pada layar kecil (< 992px), sidebar berubah menjadi drawer.
+ */
 @media (max-width: 991.98px) {
   nav.topnav {
     position: fixed;
@@ -293,11 +380,13 @@ export default {
     left: 0;
     bottom: 0;
     z-index: 1050;
+    /* Awalnya disembunyikan di luar layar (translateX -100%) */
     transform: translateX(-100%);
     transition: transform 0.25s ease-in-out;
     box-shadow: 2px 0 16px rgba(0, 0, 0, 0.1);
   }
 
+  /* Ketika mobile menu terbuka, geser ke dalam layar */
   nav.topnav.mobile-open {
     transform: translateX(0);
   }
