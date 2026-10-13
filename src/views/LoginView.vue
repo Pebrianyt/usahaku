@@ -75,32 +75,57 @@
 import { loginUser } from '@/services/auth';
 import { showToast } from '@/services/notification';
 
+/**
+ * Halaman login untuk autentikasi pengguna ke sistem UsahaKu.
+ * Pengguna memasukkan email dan password untuk mengakses aplikasi.
+ * 
+ * @description Komponen ini menangani proses login dengan validasi kredensial
+ * dan pengalihan ke halaman dashboard setelah login berhasil.
+ */
 export default {
   name: 'LoginView',
   data() {
     return {
+      /** @type {string} Email yang diinputkan pengguna */
       email: '',
+      /** @type {string} Password yang diinputkan pengguna */
       password: '',
+      /** @type {boolean} Status visibility password (true = terlihat, false = tersembunyi) */
       showPassword: false,
+      /** @type {boolean} Status pengiriman form (mencegah double submit) */
       isSubmitting: false
     };
   },
   methods: {
+    /**
+     * Menangani proses login pengguna.
+     * Melakukan validasi input, memanggil fungsi autentikasi, dan menangani hasil login.
+     * Jika berhasil, pengguna akan diarahkan ke halaman dashboard.
+     * 
+     * @async
+     * @returns {Promise<void>}
+     */
     async handleLogin() {
+      // Validasi input tidak kosong
       if (!this.email || !this.password) {
         showToast('Email dan password wajib diisi.', 'warning');
         return;
       }
 
       this.isSubmitting = true;
+      
+      // Panggil fungsi login dari service auth
       const result = await loginUser(this.email, this.password);
+      
       this.isSubmitting = false;
 
+      // Tampilkan pesan error jika login gagal
       if (!result.success) {
         showToast(result.error || 'Gagal masuk. Periksa email atau password Anda.', 'error');
         return;
       }
 
+      // Tampilkan pesan selamat datang dan arahkan ke dashboard
       showToast(`Selamat datang kembali, ${result.user.name} (${(result.user.role || 'admin').toUpperCase()})!`, 'success');
       this.$router.push('/');
     }
