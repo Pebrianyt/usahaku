@@ -17,8 +17,9 @@
       <h1 class="h3 fw-bold mb-2" style="color: var(--ink, #1B2430);">404 - Halaman Tidak Ditemukan</h1>
       
       <p class="text-secondary small mb-4">
-        Halaman yang Anda cari tidak tersedia, atau peran (role) akun Anda saat ini 
-        <strong v-if="userRole" class="text-dark">({{ userRole.toUpperCase() }})</strong> 
+        Halaman yang Anda cari tidak tersedia, atau peran (role) akun Anda saat ini
+        <!-- Tampilkan role pengguna jika sudah login dan memiliki role -->
+        <strong v-if="userRole" class="text-dark">({{ userRole.toUpperCase() }})</strong>
         tidak memiliki izin untuk mengakses menu tersebut.
       </p>
 
@@ -50,11 +51,24 @@
 </template>
 
 <script>
+/**
+ * Halaman 404 - ditampilkan ketika rute tidak ditemukan
+ */
 import { authState } from '@/services/auth';
 
+/**
+ * Komponen View untuk halaman Not Found (404)
+ * Menampilkan pesan kesalahan ketika pengguna mengakses rute yang tidak ada
+ * atau tidak memiliki izin akses ke halaman tertentu
+ */
 export default {
   name: 'NotFoundView',
   computed: {
+    /**
+     * Mengambil role pengguna yang sedang login dari state autentikasi
+     * Digunakan untuk menampilkan informasi role pada pesan 404
+     * @returns {string} Role pengguna atau string kosong jika tidak ada
+     */
     userRole() {
       return authState.user?.role || '';
     }

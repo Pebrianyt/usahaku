@@ -1,5 +1,6 @@
 <template>
   <div class="app-layout" :class="{ 'is-login-page': isLoginPage }">
+    <!-- Hanya tampilkan navbar jika BUKAN halaman login -->
     <AppNavbar v-if="!isLoginPage" />
     <RouterView />
     <NotificationToast />
@@ -8,6 +9,16 @@
 </template>
 
 <script>
+/**
+ * App.vue - Root component aplikasi UsahaKu
+ * 
+ * Komponen utama yang membungkus seluruh aplikasi.
+ * Bertanggung jawab atas layout dasar dan menampilkan komponen global.
+ * 
+ * @component
+ * @description Root component aplikasi UsahaKu
+ */
+
 import AppNavbar from '@/components/AppNavbar.vue';
 import NotificationToast from '@/components/NotificationToast.vue';
 import ConfirmModal from '@/components/ConfirmModal.vue';
@@ -20,6 +31,12 @@ export default {
     ConfirmModal
   },
   computed: {
+    /**
+     * Mendeteksi apakah pengguna sedang di halaman login
+     * Digunakan untuk menentukan apakah navbar harus ditampilkan
+     * 
+     * @returns {boolean} true jika path saat ini adalah /login
+     */
     isLoginPage() {
       return this.$route.path === '/login';
     }
@@ -39,6 +56,7 @@ export default {
   flex: 1 1 auto;
 }
 
+/* Pada halaman login, gunakan layout flex penuh dengan tinggi viewport */
 .app-layout.is-login-page {
   display: flex;
   flex-direction: column;

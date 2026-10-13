@@ -172,21 +172,34 @@
 </template>
 
 <script>
+/**
+ * Halaman master data produk - kelola data produk (tambah, ubah, hapus) dan konfigurasi HPP
+ */
 import { supabase } from '@/services/supabase';
 import { formatKode, formatRupiah, formatNominal, parseNominal } from '@/utils/currency';
 import { validasiProduk } from '@/utils/calculations';
 import { showToast, confirmAction } from '@/services/notification';
 
+/**
+ * Komponen View untuk halaman Master Data Produk
+ * Digunakan untuk mengelola data produk termasuk tambah, edit, hapus, dan ubah status
+ */
 export default {
   name: 'MasterDataView',
   data() {
     return {
+      // Array untuk menyimpan data produk dari database
       produkData: [],
+      // Query pencarian produk berdasarkan kode atau nama
       searchQuery: '',
+      // Pesan status yang ditampilkan kepada pengguna
       statusMessage: 'Menghubungkan ke database...',
+      // Flag untuk menandai sedang proses submit form
       isSubmitting: false,
+      // Form input untuk tambah produk baru
       formNama: '',
       formHppDisplay: '',
+      // State untuk mode edit produk
       editingId: null,
       editForm: {
         nama: '',
@@ -195,9 +208,17 @@ export default {
     };
   },
   computed: {
+    /**
+     * Computed property untuk mendapatkan daftar produk yang sudah difilter berdasarkan search query
+     * Jika tidak ada query, tampilkan semua produk
+     * @returns {Array} Array produk yang sudah difilter
+     */
     filteredProduk() {
+      // Normalisasi query pencarian ke lowercase untuk perbandingan
       const query = this.searchQuery.trim().toLocaleLowerCase('id-ID');
+      // Jika tidak ada query, kembalikan semua data produk
       if (!query) return this.produkData;
+      // Filter produk berdasarkan kode atau nama yang cocok dengan query
       return this.produkData.filter(item => {
         const kode = formatKode(item.id).toLocaleLowerCase('id-ID');
         const nama = String(item.nama_produk || '').toLocaleLowerCase('id-ID');
@@ -206,41 +227,75 @@ export default {
     }
   },
   methods: {
+    // Import utility functions
     formatKode,
     formatRupiah,
+
+    /**
+     * Handler untuk input HPP pada form tambah produk
+     * Mengformat input menjadi format nominal Rupiah saat pengguna mengetik
+     * @param {Event} e - Event dari input field
+     */
     onHppInput(e) {
       this.formHppDisplay = formatNominal(e.target.value);
     },
+
+    /**
+     * Handler untuk input HPP pada form edit produk
+     * Mengformat input menjadi format nominal Rupiah saat pengguna mengetik
+     * @param {Event} e - Event dari input field
+     */
     onEditHppInput(e) {
       this.editForm.hppDisplay = formatNominal(e.target.value);
     },
+
+    /**
+     * Memuat data produk dari database Supabase
+     * Mengambil semua produk dan menyimpannya ke state lokal
+     */
     async muatProduk() {
       this.statusMessage = 'Memuat data produk...';
+      // Ambil session untuk debugging (opsional)
       const { data: sessionData, error: sessionError } =
           await supabase.auth.getSession();
 
         console.log('SESSION:', sessionData.session);
         console.log('USER:', sessionData.session?.user);
 
+      // Query produk dari tabel 'produk' di database, urut berdasarkan ID ascending
       const { data, error } = await supabase.from('produk').select('*').order('id', { ascending: true });
+      // Tangani jika terjadi error saat pengambilan data
       if (error) {
         this.statusMessage = 'Gagal memuat produk: ' + error.message;
         showToast('Gagal memuat produk: ' + error.message, 'error');
         return;
       }
+      // Simpan data ke state lokal
       this.produkData = data || [];
+      // Update pesan status dengan jumlah produk
       this.statusMessage = `${this.produkData.length} produk terdaftar.`;
     },
+
+    /**
+     * Menambahkan produk baru ke database
+     * Validasi input sebelum submit ke database
+     */
     async tambahProduk() {
+      // Bersihkan whitespace dari input nama
       const namaBersih = this.formNama.trim();
+      // Parse nominal HPP dari format Rupiah ke angka
       const hpp = parseNominal(this.formHppDisplay);
+      // Validasi: cek apakah HPP diisi dan validasi nama produk (unik, tidak kosong)
       const pesan = !this.formHppDisplay.trim() ? 'HPP wajib diisi.' : validasiProduk(namaBersih, hpp, this.produkData);
+      // Tampilkan pesan error jika validasi gagal
       if (pesan) {
         showToast(pesan, 'warning');
         return;
       }
 
+      // Set flag submitting untuk disable button sementara
       this.isSubmitting = true;
+      // Insert produk baru ke database
       const { error } = await supabase.from('produk').insert([{
         nama_produk: namaBersih,
         hpp,
@@ -248,6 +303,7 @@ export default {
       }]);
       this.isSubmitting = false;
 
+      // Tangani error dari Supabase (constraint violation, dll)
       if (error) {
         const errText = error.code === '23505'
           ? 'Nama produk tersebut sudah terdaftar. Gunakan nama yang berbeda.'
@@ -256,35 +312,58 @@ export default {
         return;
       }
 
+      // Reset form dan muat ulang data produk
       showToast(`Produk "${namaBersih}" berhasil ditambahkan!`, 'success');
       this.formNama = '';
       this.formHppDisplay = '';
       await this.muatProduk();
     },
+
+    /**
+     * Memulai mode edit untuk produk tertentu
+     * Menyimpan data produk ke form edit dan set editingId
+     * @param {Object} row - Objek produk yang akan diedit
+     */
     mulaiEdit(row) {
       this.editingId = row.id;
+      // Inisialisasi form edit dengan data produk yang akan diubah
       this.editForm = {
         nama: row.nama_produk,
         hppDisplay: formatNominal(row.hpp)
       };
     },
+
+    /**
+     * Membatalkan mode edit dan menutup form
+     */
     batalEdit() {
       this.editingId = null;
     },
+
+    /**
+     * Menyimpan perubahan produk ke database
+     * Validasi input sebelum update
+     * @param {number} id - ID produk yang akan diperbarui
+     */
     async simpanEdit(id) {
+      // Bersihkan whitespace dari input
       const namaBaru = this.editForm.nama.trim();
       const hppBaru = parseNominal(this.editForm.hppDisplay);
+      // Validasi input HPP dan nama produk
       const pesan = !this.editForm.hppDisplay.trim() ? 'HPP wajib diisi.' : validasiProduk(namaBaru, hppBaru, this.produkData, id);
+      // Tampilkan pesan error jika validasi gagal
       if (pesan) {
         showToast(pesan, 'warning');
         return;
       }
 
+      // Update produk di database berdasarkan ID
       const { error } = await supabase.from('produk').update({
         nama_produk: namaBaru,
         hpp: hppBaru
       }).eq('id', id);
 
+      // Tangani error jika update gagal
       if (error) {
         const errText = error.code === '23505'
           ? 'Nama produk tersebut sudah terdaftar. Gunakan nama yang berbeda.'
@@ -293,33 +372,52 @@ export default {
         return;
       }
 
+      // Tampilkan sukses dan muat ulang data
       showToast(`Produk "${namaBaru}" berhasil diperbarui!`, 'success');
       this.editingId = null;
       await this.muatProduk();
     },
+
+    /**
+     * Mengubah status aktif/nonaktif produk
+     * Menampilkan konfirmasi sebelum mengubah status
+     * @param {Object} row - Objek produk yang akan diubah statusnya
+     */
     async toggleStatus(row) {
+      // Tentukan status baru (toggle dari status saat ini)
       const akanAktif = row.aktif === false;
       const pesan = akanAktif
         ? `Aktifkan kembali "${row.nama_produk}"? Produk akan muncul di pilihan transaksi baru.`
         : `Nonaktifkan "${row.nama_produk}"? Produk tidak akan muncul di pilihan pesanan dan stok baru. Riwayat lama tetap tersimpan.`;
 
+      // Tampilkan dialog konfirmasi
       const confirmed = await confirmAction(pesan, {
         title: akanAktif ? 'Aktifkan Produk' : 'Nonaktifkan Produk',
         confirmText: akanAktif ? 'Ya, Aktifkan' : 'Ya, Nonaktifkan',
         confirmVariant: akanAktif ? 'success' : 'warning'
       });
+      // Jika pengguna membatalkan, hentikan operasi
       if (!confirmed) return;
 
+      // Update status produk di database
       const { error } = await supabase.from('produk').update({ aktif: akanAktif }).eq('id', row.id);
       if (error) {
         showToast('Gagal mengubah status produk: ' + error.message, 'error');
         return;
       }
 
+      // Tampilkan pesan sukses dan muat ulang data
       showToast(`Status produk "${row.nama_produk}" berhasil diubah menjadi ${akanAktif ? 'Aktif' : 'Nonaktif'}.`, 'success');
       await this.muatProduk();
     },
+
+    /**
+     * Menghapus produk dari database
+     * Menampilkan konfirmasi sebelum menghapus
+     * @param {Object} row - Objek produk yang akan dihapus
+     */
     async hapusProduk(row) {
+      // Tampilkan dialog konfirmasi dengan peringatan
       const confirmed = await confirmAction(
         `Hapus produk "${row.nama_produk}"? Produk yang sudah dipakai pada pesanan atau transaksi stok tidak dapat dihapus agar riwayat tetap tersimpan.`,
         {
@@ -328,18 +426,26 @@ export default {
           confirmVariant: 'danger'
         }
       );
+      // Jika pengguna membatalkan, hentikan operasi
       if (!confirmed) return;
 
+      // Hapus produk dari database berdasarkan ID
       const { error } = await supabase.from('produk').delete().eq('id', row.id);
       if (error) {
         showToast('Gagal menghapus produk: ' + error.message, 'error');
         return;
       }
 
+      // Tampilkan pesan sukses dan muat ulang data
       showToast(`Produk "${row.nama_produk}" berhasil dihapus.`, 'success');
       await this.muatProduk();
     }
   },
+
+  /**
+   * Lifecycle hook - dipanggil saat komponen berhasil mount ke DOM
+   * Langsung memuat data produk saat halaman dibuka
+   */
   mounted() {
     this.muatProduk();
   }

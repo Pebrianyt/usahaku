@@ -334,7 +334,15 @@ import {
 } from '@/utils/currency';
 import { showToast, confirmAction } from '@/services/notification';
 
+/**
+ * Menggabungkan lapisan HPP yang memiliki harga per unit yang sama.
+ * Digunakan untuk menampilkan layer HPP yang lebih ringkas di UI.
+ * 
+ * @param {Array<{qty: number, hppPerUnit: number}>} layers - Array lapisan HPP dari transaksi masuk
+ * @returns {Array<{qty: number, hppPerUnit: number}>} Array lapisan HPP yang sudah digabungkan
+ */
 function gabungkanLapisanHpp(layers) {
+  // Gunakan Map dengan kunci harga per unit untuk mengelompokkan
   const grouped = new Map();
   (layers || []).forEach(layer => {
     const key = String(layer.hppPerUnit);
@@ -345,34 +353,66 @@ function gabungkanLapisanHpp(layers) {
   return Array.from(grouped.values());
 }
 
+/**
+ * Halaman manajemen persediaan - mencatat barang masuk, tracking stok,
+ * alokasi HPP dengan metode FIFO, dan laporan stock opname.
+ */
 export default {
   name: 'PersediaanView',
   data() {
     return {
+      /** Pesan status untuk ditampilkan kepada pengguna */
       statusMessage: 'Menghubungkan ke database...',
+      /** Flag untuk menandakan sedang proses submit data */
       isSubmitting: false,
+      /** Daftar semua produk dari tabel produk */
       daftarProduk: [],
+      /** Daftar transaksi stok (barang masuk dan keluar) */
       daftarTransaksi: [],
+      /** Daftar alokasi HPP FIFO antara transaksi masuk dan keluar */
       daftarAlokasi: [],
+      /** Objek transaksi yang sedang diedit (null jika tidak ada) */
       transaksiSedangDiedit: null,
+      /** Bulan yang dipilih untuk filter laporan (format YYYY-MM) */
       filterBulan: bulanSekarang(),
+      /** Kata kunci pencarian produk */
       filterCari: '',
+      /** Filter jenis transaksi (Masuk/Keluar) */
       filterJenis: '',
+      /** Filter tanggal mulai transaksi */
       filterTanggalMulai: '',
+      /** Filter tanggal akhir transaksi */
       filterTanggalAkhir: '',
+      /** Tanggal untuk forminput transaksi baru */
       formTanggal: tanggalLokal(),
+      /** ID produk yang dipilih di form */
       formProdukId: '',
+      /** Jenis sumber stok (Manual/Saldo Awal) */
       formSumber: 'Manual',
+      /** Jumlah qty untuk transaksi baru */
       formQty: 1,
+      /** Tampilan harga HPP dalam format Rupiah untuk form */
       formHppDisplay: '',
+      /** Flag untuk menggunakan HPP dari data produk */
       gunakanHppProduk: false,
+      /** HTML yang akan dicetak untuk stock opname */
       printHtml: ''
     };
   },
   computed: {
+    /**
+     * Daftar produk yang tersedia untuk dipilih di dropdown.
+     * Saat ini mengembalikan semua produk (bisa difilter lagi jika needed).
+     * @returns {Array} Array produk dari database
+     */
     daftarProdukPilihan() {
       return this.daftarProduk;
     },
+    /**
+     * Membuat mapping alokasi berdasarkan transaksi keluar.
+     * Setiap transaksi keluar dapat memiliki beberapa alokasi dari transaksi masuk berbeda.
+     * @returns {Map<string, Array>} Map dengan key transaksi_keluar_id dan value array alokasi
+     */
     alokasiKeluarMap() {
       const perKeluar = new Map();
       this.daftarAlokasi.forEach(item => {
@@ -387,7 +427,14 @@ export default {
       });
       return perKeluar;
     },
+    /**
+     * Membuat mapping alokasi berdasarkan transaksi masuk.
+     * Setiap transaksi masuk dapat dialokasikan ke beberapa transaksi keluar.
+     * Berguna untuk tracking saldo per lapisan HPP.
+     * @returns {Map<string, Array>} Map dengan key transaksi_masuk_id dan value array alokasi
+     */
     alokasiMasukMap() {
+      // Map transaksi keluar untuk mendapatkan tanggal keluar
       const transaksiMap = new Map(this.daftarTransaksi.map(item => [String(item.id), item]));
       const perMasuk = new Map();
       this.daftarAlokasi.forEach(item => {
@@ -399,14 +446,22 @@ export default {
           keluarId: item.transaksi_keluar_id,
           qty: Number(item.qty || 0),
           hpp: Number(item.harga_satuan || 0),
+          // Simpan tanggal keluar untuk filtering berdasarkan periode
           tanggalKeluar: keluar ? keluar.tanggal : null
         });
       });
       return perMasuk;
     },
+    /**
+     * Menghitung rekap HPP bulanan mencakup nilai persediaan awal, pembelian,
+     * persediaan akhir, dan HPP bulan berjalan menggunakan metode FIFO.
+     * @returns {Object} Object dengan nilaiAwal, nilaiPembelian, nilaiAkhir, hppBulanan
+     */
     rekapBulanan() {
       const bulan = this.filterBulan;
       if (!bulan) return { nilaiAwal: 0, nilaiPembelian: 0, nilaiAkhir: 0, hppBulanan: 0 };
+      
+      // Hitung rentang tanggal untuk bulan yang dipilih
       const { awal, akhir } = rentangBulan(bulan);
 
       let nilaiAwal = 0;
@@ -414,63 +469,92 @@ export default {
       let nilaiAkhir = 0;
 
       const perMasuk = this.alokasiMasukMap;
+      // Ambil semua transaksi masuk (setiap transaksi masuk = satu lapisan HPP)
       const lapisanMasuk = this.daftarTransaksi.filter(item => item.jenis === 'Masuk');
 
+      // Proses setiap lapisan untuk hitung nilai berdasarkan periode
       lapisanMasuk.forEach(lapisan => {
         const qty = Number(lapisan.qty || 0);
         const hpp = Number(lapisan.harga_satuan || 0);
         const alokasiLapisan = perMasuk.get(String(lapisan.id)) || [];
 
+        // Hitung qty yang sudah terpakai sebelum bulan ini (untuk nilai awal)
         const terpakaiSebelumBulan = alokasiLapisan
           .filter(item => item.tanggalKeluar && item.tanggalKeluar < awal)
           .reduce((sum, item) => sum + item.qty, 0);
 
+        // Hitung qty yang sudah terpakai sampai akhir bulan (untuk nilai akhir)
         const terpakaiSampaiAkhir = alokasiLapisan
           .filter(item => item.tanggalKeluar && item.tanggalKeluar <= akhir)
           .reduce((sum, item) => sum + item.qty, 0);
 
+        // Cek apakah ini saldo awal yang dicatat di bulan yang sama
         const saldoAwalMasukBulan = lapisan.sumber === 'Saldo Awal' && lapisan.tanggal >= awal && lapisan.tanggal <= akhir;
 
+        // Kategorikan sebagai persediaan awal jika sebelum bulan ini atau saldo awal di bulan ini
         if (lapisan.tanggal < awal || saldoAwalMasukBulan) {
           const qtyAwal = Math.max(0, qty - terpakaiSebelumBulan);
           nilaiAwal += qtyAwal * hpp;
         } else if (lapisan.tanggal <= akhir) {
+          // Masuk dalam kategori pembelian bulan ini
           nilaiPembelian += qty * hpp;
         }
 
+        // Hitung persediaan akhir (sisa setelah transaksi keluar sampai akhir bulan)
         if (lapisan.tanggal <= akhir) {
           const qtySisa = Math.max(0, qty - terpakaiSampaiAkhir);
           nilaiAkhir += qtySisa * hpp;
         }
       });
 
+      // HPP bulan ini = nilai awal + nilai pembelian - nilai akhir
+      // Ini menunjukkan nilai persediaan yang "keluar" dalam bulan tersebut
       const hppBulanan = nilaiAwal + nilaiPembelian - nilaiAkhir;
       return { nilaiAwal, nilaiPembelian, nilaiAkhir, hppBulanan };
     },
+    /**
+     * Menghitung stok tersedia saat ini untuk setiap produk.
+     * Menggunakan alokasi FIFO untuk menentukan qty dan nilai per lapisan HPP.
+     * @returns {Array} Array objek dengan info stok per produk
+     */
     stokSaatIniList() {
       const hariIni = tanggalLokal();
+      // Ambil mapping alokasi masuk untuk tracking qty terpakai per lapisan
       const perMasuk = this.alokasiMasukMap;
 
       return this.daftarProduk.map(produk => {
+        // Ambil semua transaksi masuk untuk produk ini (sampai hari ini)
         const lapisan = this.daftarTransaksi.filter(item => String(item.kode_produk) === String(produk.id) && item.jenis === 'Masuk' && item.tanggal <= hariIni);
+        // Ambil semua transaksi (masuk dan keluar) untuk produk ini
         const transaksiProduk = this.daftarTransaksi.filter(item => String(item.kode_produk) === String(produk.id) && item.tanggal <= hariIni);
+        
+        // Hitung qty tersedia: masuk (+) keluar (-)
         const qtyTersedia = transaksiProduk.reduce((total, item) => total + (item.jenis === 'Masuk' ? Number(item.qty || 0) : -Number(item.qty || 0)), 0);
 
         let qtyDariLapisan = 0;
         let nilaiStok = 0;
         const hppLayers = [];
 
+        // Kalkulasi FIFO: untuk setiap lapisan masuk, hitung qty yang tersisa
         lapisan.forEach(item => {
           const qtyMasuk = Number(item.qty || 0);
+          
+          // Hitung qty yang sudah dialokasikan ke transaksi keluar sampai hari ini
           const terpakai = (perMasuk.get(String(item.id)) || [])
             .filter(alokasi => alokasi.tanggalKeluar && alokasi.tanggalKeluar <= hariIni)
             .reduce((total, alokasi) => total + alokasi.qty, 0);
+          
+          // Sisa adalah qty yang belum terpakai (metode FIFO)
           const sisa = Math.max(0, qtyMasuk - terpakai);
+          
           qtyDariLapisan += sisa;
           nilaiStok += sisa * Number(item.harga_satuan || 0);
+          
+          // Simpan lapisan HPP jika masih ada sisa
           if (sisa > 0) hppLayers.push({ qty: sisa, hppPerUnit: Number(item.harga_satuan || 0) });
         });
 
+        // Cek apakah alokasi FIFO sudah lengkap (tidak ada selisih)
         const fifoLengkap = qtyTersedia === qtyDariLapisan;
         return {
           id: produk.id,
@@ -478,10 +562,16 @@ export default {
           qtyTersedia,
           fifoLengkap,
           nilaiStok,
+          // Gabungkan lapisan dengan harga yang sama untuk display yang lebih ringkas
           hppLayers: gabungkanLapisanHpp(hppLayers)
         };
       });
     },
+    /**
+     * Menghitung rekap per produk untuk bulan yang dipilih.
+     * Includes stok awal, masuk, keluar, stok akhir, nilai akhir, dan lapisan HPP.
+     * @returns {Array} Array objek rekap per produk
+     */
     rekapPerProdukList() {
       const bulan = this.filterBulan;
       if (!bulan) return [];
@@ -536,9 +626,17 @@ export default {
         hppLayers: gabungkanLapisanHpp(row.hppLayers)
       }));
     },
+    /**
+     * Mengambil dan memfilter transaksi berdasarkan kriteria filter.
+     * Menambahkan informasi nama produk dan menghitung nilai HPP per transaksi.
+     * @returns {Array} Array transaksi yang sudah difilter dan diurutkan
+     */
     filteredTransaksi() {
+      // Buat map produk untuk lookup nama produk
       const produkMap = new Map(this.daftarProduk.map(p => [String(p.id), p]));
+      // Kata kunci pencarian dalam lowercase
       const cari = this.filterCari.trim().toLocaleLowerCase('id-ID');
+      // Mapping alokasi keluar untuk kalkulasi nilai
       const perKeluar = this.alokasiKeluarMap;
 
       return this.daftarTransaksi
@@ -568,15 +666,26 @@ export default {
             nilaiDisplay: fifoPenuh ? formatRupiah(nilai) : 'Perlu diperiksa'
           };
         })
+        // Urutkan berdasarkan tanggal terbaru, kemudian berdasarkan ID
         .sort((a, b) => b.tanggal.localeCompare(a.tanggal) || b.id - a.id);
     }
   },
   methods: {
+    // Import fungsi utility dari file terpisah
     formatKode,
     formatRupiah,
+    /**
+     * Handler ketika pengguna menginput harga HPP di form.
+     * Mengubah input menjadi format nominal Rupiah.
+     * @param {Event} e - Event dari input field
+     */
     onHppInput(e) {
       this.formHppDisplay = formatNominal(e.target.value);
     },
+    /**
+     * Handler ketika produk dipilih di dropdown.
+     * Jika checkbox "Gunakan HPP produk" aktif, otomatis isi harga perolehan.
+     */
     onProdukChange() {
       const p = this.daftarProduk.find(
         item => String(item.id) === String(this.formProdukId)
@@ -585,11 +694,16 @@ export default {
       if (!p) return;
 
       if (this.gunakanHppProduk) {
+        // Ambil HPP dari data produk jika checkbox aktif
         this.formHppDisplay = formatNominal(p.hpp || 0);
       } else {
         this.formHppDisplay = '';
       }
     },
+    /**
+     * Handler ketika checkbox "Gunakan HPP produk" di-toggle.
+     * Mengisi atau mengosongkan harga perolehan berdasarkan pilihan.
+     */
     onToggleHppProduk() {
       const p = this.daftarProduk.find(
         item => String(item.id) === String(this.formProdukId)
@@ -603,19 +717,33 @@ export default {
         this.formHppDisplay = '';
       }
     },
+    /**
+     * Mengambil semua data dari sebuah tabel dengan pagination.
+     * Supabase memiliki batasan 1000 row per request, sehingga perlu loop.
+     * 
+     * @param {string} tabel - Nama tabel di database
+     * @param {string} kolom - Kolom-kolom yang ingin diambil (format Supabase)
+     * @returns {Promise<{data: Array, error: object|null}>}
+     */
     async ambilSemua(tabel, kolom) {
       const semua = [];
       const ukuranHalaman = 1000;
+      // Loop untuk mengambil data dalam batch 1000 row
       for (let awal = 0; ; awal += ukuranHalaman) {
         const { data, error } = await supabase.from(tabel).select(kolom)
           .order('id', { ascending: true })
           .range(awal, awal + ukuranHalaman - 1);
         if (error) return { data: null, error };
         semua.push(...(data || []));
+        // Jika data kurang dari ukuran halaman, berarti sudah selesai
         if (!data || data.length < ukuranHalaman) break;
       }
       return { data: semua, error: null };
     },
+    /**
+     * Memuat semua data yang diperlukan untuk halaman persediaan:
+     * produk, transaksi stok, dan alokasi HPP FIFO.
+     */
     async muatDataStok() {
       this.statusMessage = 'Memuat data persediaan...';
       const hasil = await Promise.all([
@@ -637,20 +765,29 @@ export default {
 
       this.statusMessage = `Data stok berhasil dimuat: ${this.daftarProduk.length} produk dan ${this.daftarTransaksi.length} transaksi.`;
     },
+    /**
+     * Menyimpan transaksi stok masuk baru atau mengubah transaksi yang sudah ada.
+     * Menggunakan RPC PostgreSQL untuk operasi yang mencakup transaksi dan alokasi FIFO.
+     * Setelah berhasil, akan memuat ulang semua data stok.
+     */
     async simpanStok() {
+      // Ambil nilai dari form
       const kodeProduk = Number(this.formProdukId);
       const qty = Number(this.formQty);
       const hargaSatuan = parseNominal(this.formHppDisplay);
       const tanggal = this.formTanggal;
       const sumber = this.formSumber;
 
+      // Validasi input
       if (!kodeProduk || !tanggal || !Number.isInteger(qty) || qty <= 0 || !Number.isFinite(hargaSatuan) || hargaSatuan < 0) {
         showToast('Mohon lengkapi semua kolom dengan nilai yang valid.', 'warning');
         return;
       }
 
       this.isSubmitting = true;
+      // Pilih RPC yang sesuai: simpan baru atau ubah yang sudah ada
       const namaRpc = this.transaksiSedangDiedit ? 'ubah_stok_masuk_fifo' : 'simpan_stok_masuk_fifo';
+      // Bangun parameter sesuai dengan tipe operasi
       const parameter = this.transaksiSedangDiedit
         ? { p_transaksi_id: this.transaksiSedangDiedit.id, p_tanggal: tanggal, p_kode_produk: kodeProduk, p_qty: qty, p_harga_satuan: hargaSatuan, p_sumber: sumber }
         : { p_tanggal: tanggal, p_kode_produk: kodeProduk, p_qty: qty, p_harga_satuan: hargaSatuan, p_sumber: sumber, p_keterangan: null };
@@ -667,6 +804,11 @@ export default {
       this.batalEditStok();
       await this.muatDataStok();
     },
+    /**
+     * Memulai mode edit untuk transaksi stok yang dipilih.
+     * Mengisi form dengan data transaksi yang akan diedit.
+     * @param {Object} transaksi - Objek transaksi yang akan diedit
+     */
     mulaiEditStok(transaksi) {
       this.transaksiSedangDiedit = transaksi;
       this.formTanggal = transaksi.tanggal;
@@ -677,6 +819,9 @@ export default {
       this.formHppDisplay = formatNominal(transaksi.harga_satuan || 0);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     },
+    /**
+     * Membatalkan mode edit dan mereset form ke kondisi awal.
+     */
     batalEditStok() {
       this.transaksiSedangDiedit = null;
       this.formTanggal = tanggalLokal();
@@ -686,7 +831,14 @@ export default {
       this.formHppDisplay = '';
       this.gunakanHppProduk = false;
     },
+    /**
+     * Menghapus transaksi stok masuk beserta alokasi HPP-nya.
+     * Hanya menghapus transaksi Masuk (bukan Keluar).
+     * 
+     * @param {Object} transaksi - Objek transaksi yang akan dihapus
+     */
     async hapusStokMasuk(transaksi) {
+      // Tampilkan konfirmasi sebelum menghapus
       const confirmed = await confirmAction(
         `Hapus barang masuk ${formatKode(transaksi.kode_produk)} sebanyak ${transaksi.qty} pcs pada ${transaksi.tanggal}? Stok dan HPP pesanan terkait akan dihitung ulang.`,
         {
@@ -697,6 +849,7 @@ export default {
       );
       if (!confirmed) return;
 
+      // Panggil RPC untuk menghapus dengan mempertimbangkan alokasi FIFO
       const { error } = await supabase.rpc('hapus_stok_masuk_fifo', { p_transaksi_id: transaksi.id });
       if (error) {
         showToast('Stok tidak dapat dihapus: ' + error.message, 'error');
@@ -706,6 +859,10 @@ export default {
       showToast('Barang masuk berhasil dihapus.', 'success');
       await this.muatDataStok();
     },
+    /**
+     * Mencetak daftar stok semua produk yang tersedia saat ini.
+     * Mencakup nama produk dan qty yang tersedia.
+     */
     cetakStokSemuaProduk() {
       const hariIni = tanggalLokal();
       const list = this.stokSaatIniList.map(item => ({
@@ -714,24 +871,44 @@ export default {
       }));
       this.renderAndPrintOpname('Daftar Stok Semua Produk', `Stok barang tersedia per ${formatTanggalIndonesia(hariIni)}`, list);
     },
+    /**
+     * Mencetak form stock opname mingguan untuk produk yang bertransaksi
+     * dalam 7 hari terakhir (hari ini dan 6 hari ke belakang).
+     * Hanya menampilkan produk yang memiliki transaksi pada periode tersebut.
+     */
     cetakOpnameMingguan() {
       const hariIni = tanggalLokal();
+      // Hitung tanggal 6 hari yang lalu
       const mulaiTanggalDate = new Date(`${hariIni}T00:00:00`);
       mulaiTanggalDate.setDate(mulaiTanggalDate.getDate() - 6);
       const mulaiTanggal = tanggalLokal(mulaiTanggalDate);
+      
+      // Filter produk yang bertransaksi dalam periode mingguan
       const produkBertransaksi = new Set(this.daftarTransaksi
         .filter(item => ['Masuk', 'Keluar'].includes(item.jenis) && item.tanggal >= mulaiTanggal && item.tanggal <= hariIni)
         .map(item => String(item.kode_produk)));
+      
+      // Ambil produk yang bertransaksi dengan stoknya saat ini
       const list = this.stokSaatIniList.filter(item => produkBertransaksi.has(String(item.id))).map(item => ({
         nama: item.nama_produk,
         qty: item.qtyTersedia
       }));
+      
+      // Render dan cetak
       this.renderAndPrintOpname(
         'Form Stock Opname Mingguan',
         `Produk dengan transaksi stok ${formatTanggalIndonesia(mulaiTanggal)} sampai ${formatTanggalIndonesia(hariIni)}`,
         list
       );
     },
+    /**
+     * Me-render HTML untuk printable area dan menjalankan window.print().
+     * HTML ditambahkan ke element tersembunyi yang di-teleport ke body.
+     * 
+     * @param {string} judul - Judul laporan
+     * @param {string} keterangan - Keterangan periode laporan
+     * @param {Array} produkList - Array objek produk {nama, qty}
+     */
     renderAndPrintOpname(judul, keterangan, produkList) {
       const baris = produkList.map((p, idx) => `
         <tr>

@@ -292,7 +292,7 @@
         </div>
       </article>
 
-      <article class="dashboardPanel detailPanel">
+      <article class="dashboardPanel detailPanel mt-3">
         <div class="panelHeading">
           <div>
             <h2>Detail Penjualan</h2>
@@ -331,32 +331,72 @@ import { authState, authReady } from '@/services/auth';
 const JUMLAH_BULAN_GRAFIK = 12;
 const NAMA_BULAN = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
+/**
+ * Halaman dashboard utama yang menampilkan ringkasan bisnis.
+ * Menampilkan metrik kunci yang berbeda berdasarkan peran pengguna:
+ * - Owner: Pendapatan, pengeluaran, laba bersih, saldo kas, tren penjualan, arus kas tahunan
+ * - Admin: Produk terlaris, jumlah pesanan, detail penjualan (tanpa data keuangan)
+ * 
+ * @description Komponen dashboard dengan role-based rendering untuk keamanan data keuangan
+ */
 export default {
   name: 'DashboardView',
   data() {
     return {
+      /** @type {string} Bulan yang dipilih untuk filter (format YYYY-MM) */
       selectedMonth: bulanSekarang(),
+      /** @type {string} Pesan status untuk ditampilkan ke pengguna */
       statusMessage: 'Menghubungkan ke database...',
+      /** @type {Array} Semua data pesanan dari database */
       semuaPesanan: [],
+      /** @type {Array} Semua data produk dari database */
       semuaProduk: [],
+      /** @type {Array} Semua transaksi stok dari database */
       semuaTransaksiStok: [],
+      /** @type {Array} Semua alokasi stok FIFO dari database */
       semuaAlokasiStok: [],
+      /** @type {Array} Semua transaksi kas dari database */
       semuaTransaksiKas: [],
+      /** @type {Array} Warna untuk chart pareto dan grafik (5 warna berbeda) */
       paretoColors: ['#6E9B66', '#D98E2B', '#5385A6', '#8769A0', '#4A928F']
     };
   },
   computed: {
+    /**
+     * Memeriksa apakah pengguna yang login memiliki peran 'owner'.
+     * Digunakan untuk menentukan section mana yang ditampilkan di dashboard.
+     * 
+     * @returns {boolean} True jika user adalah owner, false jika admin
+     */
     isOwner() {
       return authState.user?.role === 'owner';
     },
+    /**
+     * Mengambil tahun dari bulan yang dipilih.
+     * 
+     * @returns {number} Tahun dalam angka
+     */
     selectedYear() {
       return Number((this.selectedMonth || '').slice(0, 4)) || new Date().getFullYear();
     },
+    /**
+     * Mengambil label bulan yang dipilih dalam format Indonesia.
+     * Contoh: "Januari 2024"
+     * 
+     * @returns {string} Label bulan dalam Bahasa Indonesia
+     */
     selectedMonthLabel() {
       if (!this.selectedMonth) return '';
       const [year, month] = this.selectedMonth.split('-').map(Number);
       return new Date(year, month - 1, 1).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
     },
+
+    /**
+     * Menghitung total HPP (Harga Pokok Penjualan) per pesanan menggunakan data alokasi stok.
+     * Membuat peta yang menghubungkan ID pesanan dengan total HPP nya.
+     * 
+     * @returns {Map<string, number>} Peta ID pesanan ke total HPP
+     */
     hppPerPesanan() {
       const hppPerKeluar = new Map();
       this.semuaAlokasiStok.forEach(alokasi => {
@@ -374,6 +414,13 @@ export default {
       });
       return hppByOrder;
     },
+
+    /**
+     * Mengelompokkan pesanan berdasarkan bulan dan nomor pesanan.
+     * Menghitung total dan status realisasi untuk setiap kelompok.
+     * 
+     * @returns {Array} Array objek kelompok pesanan dengan total, HPP, dan status
+     */
     kelompokPesanan() {
       const kelompok = new Map();
       this.semuaPesanan.forEach(row => {
@@ -401,11 +448,24 @@ export default {
       });
       return Array.from(kelompok.values());
     },
+
+    /**
+     * Mengambil semua pesanan untuk bulan yang dipilih.
+     * 
+     * @returns {Array} Array pesanan yang difilter berdasarkan bulan
+     */
     pesananBulanTerpilih() {
       return this.semuaPesanan.filter(row =>
         row.tanggal_pesanan && row.tanggal_pesanan.slice(0, 7) === this.selectedMonth
       );
     },
+
+    /**
+     * Mengambil semua transaksi kas untuk bulan yang dipilih.
+     * Includes filter tanggal awal hingga akhir bulan.
+     * 
+     * @returns {Array} Array transaksi kas yang difilter
+     */
     transaksiKasBulanTerpilih() {
       if (!this.selectedMonth) return [];
       const { awal, akhir } = rentangBulan(this.selectedMonth);
@@ -425,6 +485,14 @@ export default {
       });
       return biaya;
     },
+
+    /**
+     * Menghitung ringkasan metrik bisnis untuk bulan yang dipilih.
+     * Includes pendapatan, pengeluaran, laba bersih, dan saldo kas.
+     * Untuk owner only - admin melihat data yang berbeda.
+     * 
+     * @returns {Object} Objek berisi metrik: pendapatan, pengeluaran, labaBersih, saldoKas
+     */
     summary() {
       const transaksiBulan = this.transaksiKasBulanTerpilih;
       const kelompokBulan = this.kelompokPesanan.filter(item => item.bulan === this.selectedMonth);
@@ -461,6 +529,14 @@ export default {
         totalBarang: pesanan.reduce((sum, item) => sum + Number(item.qty || 0), 0)
       };
     },
+
+    /**
+     * Mengambil data untuk chart tren penjualan (sales trend).
+     * Menampilkan total omzet per bulan untuk 12 bulan terakhir.
+     * Hanya untuk owner.
+     * 
+     * @returns {Array} Array objek dengan key, label, dan total omzet
+     */
     chartSalesData() {
       const months = this.daftarBulanTerakhir(this.selectedMonth);
       const totals = new Map(months.map(item => [item.key, 0]));
@@ -469,6 +545,12 @@ export default {
       });
       return months.map(item => ({ ...item, total: totals.get(item.key) || 0 }));
     },
+
+    /**
+     * Menghitung nilai maksimal untuk scale sumbu Y pada chart penjualan.
+     * 
+     * @returns {number} Nilai maksimal untuk sumbu Y
+     */
     salesChartMax() {
       return Math.max(1, ...this.chartSalesData.map(item => item.total));
     },
@@ -486,6 +568,14 @@ export default {
     chartSalesHasData() {
       return this.chartSalesData.some(item => item.total > 0);
     },
+    
+    /**
+     * Mengambil data untuk chart jumlah pesanan per bulan.
+     * Menghitung pesanan unik per bulan (Set untuk menghindari duplikasi).
+     * Tersedia untuk owner dan admin.
+     * 
+     * @returns {Array} Array objek dengan key, label, dan count pesanan
+     */
     chartPesananData() {
       const months = this.daftarBulanTerakhir(this.selectedMonth);
       const counts = new Map(months.map(item => [item.key, new Set()]));
@@ -494,6 +584,12 @@ export default {
       });
       return months.map(item => ({ ...item, count: counts.get(item.key).size }));
     },
+
+    /**
+     * Menghitung nilai maksimal untuk scale sumbu Y pada chart pesanan.
+     * 
+     * @returns {number} Nilai maksimal untuk sumbu Y
+     */
     chartPesananMax() {
       return Math.max(1, ...this.chartPesananData.map(item => item.count));
     },
@@ -533,9 +629,22 @@ export default {
         .sort((a, b) => b.qty - a.qty || a.nama.localeCompare(b.nama))
         .slice(0, 5);
     },
+    /**
+     * Menghitung nilai maksimal untuk scale pada chart produk terlaris.
+     * 
+     * @returns {number} Nilai maksimal untuk sumbu Y
+     */
     productMax() {
       return Math.max(1, ...this.produkTerlaris.map(item => item.qty));
     },
+
+    /**
+     * Mengambil data laporan laba-rugi tahunan per bulan.
+     * Menampilkan omzet, HPP, dan biaya operasional per bulan.
+     * Hanya untuk owner.
+     * 
+     * @returns {Array} Array objek dengan key, label, omzet, hpp, biayaOperasional, labaKotor
+     */
     labaRugiTahunan() {
       const year = String(this.selectedYear);
       const months = Array.from({ length: 12 }, (_, index) => ({
