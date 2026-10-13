@@ -172,20 +172,44 @@ import { hitungLabaRugi } from '@/utils/calculations';
 import { showToast } from '@/services/notification';
 import { jsPDF } from 'jspdf';
 
+/**
+ * Komponen halaman laporan laba-rugi
+ * Menampilkan analisis pendapatan, HPP (Harga Pokok Penjualan),
+ * laba kotor, biaya operasional, dan laba bersih per periode
+ * Menggunakan data dari Supabase dan kalkulasi utility hitungLabaRugi
+ */
 export default {
   name: 'LabaRugiView',
   data() {
     return {
+      /** Periode bulan yang dipilih untuk laporan (format YYYY-MM) */
       filterBulan: bulanSekarang(),
+      /** Pesan status yang ditampilkan kepada pengguna */
       statusMessage: 'Memuat laporan laba rugi...',
+      /** Indicator loading saat proses pengambilan data */
       isLoading: true,
+      /** Data pesanan dari tabel pesanan di Supabase */
       pesanan: [],
+      /** Data transaksi stok dari tabel transaksi_stok */
       transaksiStok: [],
+      /** Data alokasi stok FIFO dari tabel alokasi_stok_fifo */
       alokasiStok: [],
+      /** Data transaksi kas dari tabel transaksi_kas */
       transaksiKas: []
     };
   },
   computed: {
+    /**
+     * Menghitung data laporan laba-rugi berdasarkan data yang dimuat
+     * Menggunakan utility hitungLabaRugi untuk pemrosesan:
+     * - omzetRealisasi: pendapatan dari pesanan berstatus Realisasi
+     * - omzetPotential: total pendapatan dari semua pesanan
+     * - hppRealisasi: total HPP dari pesanan Realisasi
+     * - biayaOperasional: total biaya dari transaksi_kas
+     * - labaKotorRealisasi: omzetRealisasi - hppRealisasi
+     * - labaBersihRealisasi: labaKotorRealisasi - biayaOperasional
+     * @returns {Object} Object berisi semua metrik laporan laba-rugi
+     */
     labaRugiData() {
       return hitungLabaRugi(
         this.pesanan,
@@ -198,6 +222,14 @@ export default {
   },
   methods: {
     formatRupiah,
+    /**
+     * Mengambil semua data dari tabel Supabase dengan pagination
+     * Menggunakan cursor-based pagination untuk handle dataset besar
+     * @param {string} tabel - Nama tabel di Supabase
+     * @param {string} kolom - Kolom yang ingin diambil (gunakan * untuk semua)
+     * @param {string} [orderKolom='id'] - Kolom untuk pengurutan
+     * @returns {Promise<{data: Array, error: Object|null}>}
+     */
     async ambilSemua(tabel, kolom, orderKolom = 'id') {
       const semua = [];
       const ukuranHalaman = 1000;
@@ -211,6 +243,14 @@ export default {
       }
       return { data: semua, error: null };
     },
+    /**
+     * Memuat semua data yang diperlukan untuk laporan:
+     * - pesanan: data pesanan dengan status dan total penghasilan
+     * - transaksiStok: data keluar/masuk stok per pesanan
+     * - alokasiStok: data alokasi stok metode FIFO untuk HPP
+     * - transaksiKas: data pendapatan dan biaya operasional
+     * Setelah data dimuat, hitungLabaRugi akan memproses otomatis via computed
+     */
     async muatData() {
       this.statusMessage = 'Memuat pesanan, stok, dan transaksi kas...';
       this.isLoading = true;
@@ -221,6 +261,7 @@ export default {
         this.ambilSemua('transaksi_kas', 'id, tanggal, jenis, kategori, nominal, keterangan')
       ]);
 
+      // Cek apakah ada error pada salah satu pengambilan data
       const gagal = hasil.find(item => item.error);
       this.isLoading = false;
       if (gagal) {
@@ -229,6 +270,7 @@ export default {
         return;
       }
 
+      // Simpan data ke state komponen untuk dihitung oleh computed labaRugiData
       this.pesanan = hasil[0].data || [];
       this.transaksiStok = hasil[1].data || [];
       this.alokasiStok = hasil[2].data || [];
@@ -236,6 +278,15 @@ export default {
 
       this.statusMessage = 'Laporan siap ditampilkan.';
     },
+    /**
+     * Menghasilkan dan mengunduh laporan PDF menggunakan jsPDF
+     * Struktur PDF:
+     * - Header: nama aplikasi dan periode laporan
+     * - Tabel ringkasan: Pendapatan, Beban Pokok Penjualan, Laba Kotor, Biaya Operasional, Laba Bersih
+     * - Kotak analisis margin: Gross Profit Margin (GPM) dan Net Profit Margin (NPM)
+     * - Catatan: informasi metodologi laporan
+     * - Footer: informasi generator laporan
+     */
     unduhLaporanPdf() {
       try {
         const bulan = this.filterBulan;
