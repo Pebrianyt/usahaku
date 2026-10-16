@@ -161,6 +161,64 @@
         </tbody>
       </table>
     </div>
+
+    <h2 class="fs-5 fw-bold mb-2 mt-4">Semua Transaksi Kas</h2>
+    <div class="tableScroll table-responsive">
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th scope="col">Tanggal</th>
+            <th scope="col">Jenis</th>
+            <th scope="col">Kategori</th>
+            <th scope="col">Keterangan</th>
+            <th scope="col">Nominal</th>
+            <th scope="col" style="width: 100px;">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-if="transaksiKas.length === 0">
+            <td colspan="6" class="text-center py-4 text-secondary">
+              Belum ada transaksi kas.
+            </td>
+          </tr>
+          <tr v-for="t in transaksiKas" :key="t.id">
+            <td>{{ t.tanggal }}</td>
+            <td>
+              <span :class="['badge', t.jenis === 'Masuk' ? 'bg-success' : (t.jenis === 'Keluar' ? 'bg-danger' : 'bg-primary')]">
+                {{ t.jenis }}
+              </span>
+            </td>
+            <td>{{ t.kategori || '-' }}</td>
+            <td>{{ t.keterangan || '-' }}</td>
+            <td :class="t.jenis === 'Keluar' ? 'text-danger fw-bold' : 'text-success fw-bold'">
+              {{ formatRupiah(t.nominal) }}
+            </td>
+            <td>
+              <div class="d-flex align-items-center gap-1">
+                <button
+                  class="btnIcon btnEdit"
+                  title="Edit transaksi"
+                  @click="mulaiEditKas(t)"
+                >
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#1B2430" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+                  </svg>
+                </button>
+                <button
+                  class="btnIcon btnHapus"
+                  title="Hapus transaksi"
+                  @click="hapusKas(t)"
+                >
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#1B2430" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </main>
 </template>
 
