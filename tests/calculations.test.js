@@ -13,7 +13,7 @@ import {
   hitungLabaRugi, 
   validasiProduk 
 } from '../src/utils/calculations.js';
-import { getInitials, REGISTERED_USERS, DEFAULT_PASSWORD } from '../src/services/auth.js';
+import { getInitials } from '../src/services/auth.js';
 
 describe('UsahaKu Unit Tests - All Features', () => {
 
@@ -61,14 +61,9 @@ describe('UsahaKu Unit Tests - All Features', () => {
       expect(getInitials('SISWANTO')).toBe('SI');
     });
 
-    it('contains owner and admin roles correctly configured', () => {
-      expect(DEFAULT_PASSWORD).toBe('adm1nusahaku');
-      expect(REGISTERED_USERS['yangpunya@gmail.com']?.role).toBe('owner');
-      expect(REGISTERED_USERS['kholan.childs404@gmail.com']?.role).toBe('admin');
-      expect(REGISTERED_USERS['kartikaniadewi@gmail.com']?.role).toBe('admin');
-      expect(REGISTERED_USERS['muhammadridhaby@gmail.com']?.role).toBe('admin');
-      expect(REGISTERED_USERS['pebrianyrstn@gmail.com']?.role).toBe('admin');
-      expect(REGISTERED_USERS['siswanto7612@gmail.com']?.role).toBe('admin');
+    it('returns a safe fallback for missing names', () => {
+      expect(getInitials('')).toBe('U');
+      expect(getInitials(null)).toBe('U');
     });
   });
 
